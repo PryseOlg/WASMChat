@@ -11,13 +11,19 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
 {
     // Таблица для чатов
     public DbSet<Chat> Chats => Set<Chat>();
-
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<ChatUser> ChatUsers => Set<ChatUser>();
 
+    private static bool firstRun = true;
     public ApplicationDbContext(
         DbContextOptions options,
         IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
+        if (firstRun)
+        {
+            Database.Migrate();
+            firstRun = false;
+        }
     }
     
     protected override void OnModelCreating(ModelBuilder builder)
