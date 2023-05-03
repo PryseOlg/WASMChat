@@ -9,4 +9,5 @@ public class Chat
     public ICollection<Message> Messages { get; set; } = new List<Message>();
 
     public ICollection<ChatUser> ChatUsers { get; set; } = new List<ChatUser>();
+    
 }
