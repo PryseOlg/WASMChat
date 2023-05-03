@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WASMChat.Server.Data;
+using WASMChat.Server.Data.Repositories;
 using WASMChat.Server.Models;
 
 namespace WASMChat.Server;
@@ -25,6 +26,7 @@ public class Startup
         
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
+        services.AddRepositories<ApplicationDbContext>();
         
         services.AddDatabaseDeveloperPageExceptionFilter();
 

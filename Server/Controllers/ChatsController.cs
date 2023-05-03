@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WASMChat.Server.Data;
+using WASMChat.Server.Data.Repositories;
 using WASMChat.Server.Models;
 using WASMChat.Shared.Messages;
 
@@ -13,22 +14,19 @@ namespace WASMChat.Server.Controllers;
 [Route("[controller]")]
 public class ChatsController : ControllerBase
 {
-    private readonly ApplicationDbContext _ctx;
+    private readonly ApplicationUserRepository _userRepo;
 
-    public ChatsController(ApplicationDbContext ctx)
+    public ChatsController(ApplicationUserRepository userRepo, ChatUserRepository chatUserRepository)
     {
-        _ctx = ctx;
+        _userRepo = userRepo;
     }
 
     [HttpPost("/register")]
     public async Task<IActionResult> Register(
         [FromBody] string userName)
     {
-        string? userId = User.GetUserId();
-        var appUser = await _ctx.Users
-            .Include(x => x.ChatUser)
-            .FirstOrDefaultAsync(x => x.Id == userId);
-
+        var appUser = await _userRepo.GetByClaimsPrincipal(User);
+        
         if (appUser is null) return BadRequest("Бля ты кто");
         if (appUser.ChatUser is not null) return BadRequest("Ты еблан?");
         
@@ -37,7 +35,14 @@ public class ChatsController : ControllerBase
             Name = userName
         };
 
-        await _ctx.SaveChangesAsync();
+        try
+        {
+            await _userRepo.CommitAsync();
+        }
+        catch (DbUpdateException e)
+        {
+            return BadRequest(e.Message);
+        }
         return Ok(appUser.ChatUser);
     }
 }

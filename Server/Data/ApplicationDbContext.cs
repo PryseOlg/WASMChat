@@ -14,15 +14,15 @@ public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<ChatUser> ChatUsers => Set<ChatUser>();
 
-    private static bool firstRun = true;
+    private static bool _firstRun = true;
     public ApplicationDbContext(
         DbContextOptions options,
         IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
     {
-        if (firstRun)
+        if (_firstRun)
         {
             Database.Migrate();
-            firstRun = false;
+            _firstRun = false;
         }
     }
     
