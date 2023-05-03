@@ -10,7 +10,9 @@ public class Message
     
     public ChatUser Author { get; set; }
     
+    public int AuthorId { get; set; }
+    
     public Chat Chat { get; set; }
     
-    
+    public int ChatId { get; set; }
 }

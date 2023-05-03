@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WASMChat.Server.Data;
 using WASMChat.Server.Data.Repositories;
 using WASMChat.Server.Models;
+using WASMChat.Server.Services;
 
 namespace WASMChat.Server;
 
@@ -39,8 +42,16 @@ public class Startup
         services.AddAuthentication()
             .AddIdentityServerJwt();
 
-        services.AddControllersWithViews();
+        services.AddControllersWithViews()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            });
+        
         services.AddRazorPages();
+
+        services.AddScoped<ChatUserService>();
 
         services.AddSwaggerGen(ConfigureSwaggerGen); // Добавляет сервисы для сваггера
     }

@@ -15,8 +15,9 @@ public class ChatUserEntityConfiguration: IEntityTypeConfiguration<ChatUser>
         builder.HasMany(x => x.Chats)
             .WithMany(x => x.ChatUsers)
             .UsingEntity(e => e.ToTable("UsersInChats"));
-        
+
         builder.HasMany(x => x.Messages)
-            .WithOne(x => x.Author);
+            .WithOne(x => x.Author)
+            .HasForeignKey(x => x.AuthorId);
     }
 }

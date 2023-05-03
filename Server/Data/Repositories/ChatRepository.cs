@@ -9,13 +9,17 @@ public class ChatRepository : RepositoryBase<Chat>
     public ChatRepository(DbContext ctx) : base(ctx)
     { }
 
-    public ValueTask<Chat?> GetChatByIdAsync(int id) 
-        => Set.FindAsync(id);
-    
+    public Task<Chat?> GetChatByIdAsync(int id) => Set
+        .Include(x => x.ChatUsers)
+        .Include(x => x.Messages)
+        .ThenInclude(x => x.Author)
+        .FirstOrDefaultAsync(x => x.Id == id);
+
     public async ValueTask<Chat> SaveChat(Chat chat)
     {
         Set.Add(chat);
         await CommitAsync();
         return chat;
     }
+
 }

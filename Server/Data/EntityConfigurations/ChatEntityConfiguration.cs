@@ -11,9 +11,10 @@ public class ChatEntityConfiguration: IEntityTypeConfiguration<Chat>
         builder.ToTable("Chats");
         
         builder.HasKey(x => x.Id);
-        
+
         builder.HasMany(x => x.Messages)
-            .WithOne(x => x.Chat);
+            .WithOne(x => x.Chat)
+            .HasForeignKey(x => x.ChatId);
         
         builder.HasMany(x => x.ChatUsers)
             .WithMany(x => x.Chats)
