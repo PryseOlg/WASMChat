@@ -1,0 +1,41 @@
+﻿@page "/chat/{ChatId:int}"
+@using WASMChat.Shared.Models.Chats
+@using WASMChat.Shared.Results.Chats
+@inject HttpClient Http
+
+<h3>Chat</h3>
+
+@if (ChatModel is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @ChatModel.Name
+    @foreach (var msg in ChatModel.Messages)
+    {
+        <ChatMessageComponent Message=msg/>
+    }
+}
+
+@code {
+    public ChatModel? ChatModel { get; set; }
+    
+    [Parameter]
+    public int ChatId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
+            ChatModel = response!.Chat;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+
+}

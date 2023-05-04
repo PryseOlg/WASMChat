@@ -1,0 +1,9 @@
+﻿@using WASMChat.Shared.Models.Chats
+<h6 class="author">@Message.Author.UserName</h6>
+@Message.Text
+
+@code {
+    [Parameter]
+    public ChatMessageModel Message { get; set; }
+    
+}
