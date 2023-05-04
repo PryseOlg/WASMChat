@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WASMChat.Data.Entities.Chats;
-using WASMChat.Server.Extensions;
 using WASMChat.Server.Mappers.Chats;
-using WASMChat.Server.Services;
 using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
@@ -33,7 +31,7 @@ public class ChatsController : ControllerBase
     
     [HttpGet]
     public async Task<IActionResult> GetChats(
-        [FromBody] GetAllChatsRequest request)
+        [FromQuery] GetAllChatsRequest request)
     {
         var chats = await _chatService.GetAllChatsAsync(request, User);
 
@@ -60,7 +58,7 @@ public class ChatsController : ControllerBase
     [HttpGet("{chatId}")]
     public async Task<IActionResult> GetChat(
         [FromRoute] int chatId,
-        [FromBody] GetChatRequest request)
+        [FromQuery] GetChatRequest request)
     {
         request.ChatId = chatId;
         Chat? chat = await _chatService.GetChatAsync(request, User);
@@ -81,7 +79,7 @@ public class ChatsController : ControllerBase
     {
         request.ChatId = chatId;
 
-        ChatMessage message = await _chatMessageService.SendMessageAsync(request);
+        ChatMessage message = await _chatMessageService.SendMessageAsync(request, User);
         
         var result = new PostChatMessageResult()
         {

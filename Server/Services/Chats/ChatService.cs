@@ -34,7 +34,7 @@ public class ChatService : IService
 
     public async ValueTask<Chat> CreateChatAsync(CreateChatRequest request, ClaimsPrincipal principal)
     {
-        var user = _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegister(principal);
         request.OwnerId = user.Id;
 
         var members = request.MemberIds

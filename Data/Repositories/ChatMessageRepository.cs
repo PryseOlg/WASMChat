@@ -10,9 +10,9 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
     public ChatMessageRepository(DbContext ctx) : base(ctx)
     { }
 
-    public async ValueTask<ChatMessage> SaveMessage(ChatMessage chatMessage)
+    public async ValueTask<ChatMessage> SaveMessageAsync(ChatMessage chatMessage)
     {
-        chatMessage.DateTimeSent = DateTimeOffset.Now;
+        chatMessage.DateTimeSent = DateTimeOffset.UtcNow;
         Set.Add(chatMessage);
         await CommitAsync();
         return chatMessage;

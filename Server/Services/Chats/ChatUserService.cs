@@ -3,7 +3,6 @@ using System.Security.Claims;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Exceptions;
-using WASMChat.Server.Extensions;
 
 namespace WASMChat.Server.Services.Chats;
 
