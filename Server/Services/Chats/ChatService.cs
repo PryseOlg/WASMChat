@@ -59,7 +59,7 @@ public class ChatService : IService
 
     public async ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(GetAllChatsRequest request, ClaimsPrincipal principal)
     {
-        var user = _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegister(principal);
         request.UserId = user.Id;
 
         return await _chatRepository.GetAllChats(request.UserId, request.Page);

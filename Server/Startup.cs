@@ -41,6 +41,7 @@ public class Startup
             .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
         services.AddAuthentication()
+            .AddCustomOAuth(_config)
             .AddIdentityServerJwt();
 
         services.AddControllersWithViews()
