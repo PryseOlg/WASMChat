@@ -4,10 +4,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using WASMChat.Server.Data;
-using WASMChat.Server.Data.Repositories;
-using WASMChat.Server.Models;
+using WASMChat.Data.Entities;
+using WASMChat.Data;
+using WASMChat.Data.Repositories;
+using WASMChat.Server.Mappers;
 using WASMChat.Server.Services;
+using WASMChat.Server.Validators;
 
 namespace WASMChat.Server;
 
@@ -51,7 +53,9 @@ public class Startup
         
         services.AddRazorPages();
 
-        services.AddScoped<ChatUserService>();
+        services.AddServices();
+        services.AddValidators();
+        services.AddMappers();
 
         services.AddSwaggerGen(ConfigureSwaggerGen); // Добавляет сервисы для сваггера
     }

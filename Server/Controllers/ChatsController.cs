@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using WASMChat.Server.Data.Repositories;
-using WASMChat.Server.Models;
+using WASMChat.Data.Entities.Chats;
+using WASMChat.Server.Extensions;
+using WASMChat.Server.Mappers.Chats;
 using WASMChat.Server.Services;
-using WASMChat.Shared.Messages;
+using WASMChat.Server.Services.Chats;
+using WASMChat.Shared.Requests.Chats;
+using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Server.Controllers;
 
@@ -13,103 +15,79 @@ namespace WASMChat.Server.Controllers;
 [Route("api/[controller]")]
 public class ChatsController : ControllerBase
 {
-    private readonly ChatRepository _chatRepository;
-    private readonly ChatUserService _chatUserService;
-    private readonly ChatUserRepository _chatUserRepository;
-    private readonly MessageRepository _messageRepository;
+    private readonly ChatMessageService _chatMessageService;
+    private readonly ChatMessageModelMapper _chatMessageModelMapper;
+    private readonly ChatModelMapper _chatModelMapper;
+    private readonly ChatService _chatService;
 
-
-    public ChatsController(ChatRepository chatRepository, MessageRepository messageRepository, ChatUserService chatUserService, ChatUserRepository chatUserRepository)
+    public ChatsController(ChatMessageService chatMessageService, 
+        ChatMessageModelMapper chatMessageModelMapper, 
+        ChatModelMapper chatModelMapper, 
+        ChatService chatService)
     {
-        _chatRepository = chatRepository;
-        _messageRepository = messageRepository;
-        _chatUserService = chatUserService;
-        _chatUserRepository = chatUserRepository;
+        _chatMessageService = chatMessageService;
+        _chatMessageModelMapper = chatMessageModelMapper;
+        _chatModelMapper = chatModelMapper;
+        _chatService = chatService;
     }
     
     [HttpGet]
     public async Task<IActionResult> GetChats(
-        int page = 0)
+        [FromBody] GetAllChatsRequest request)
     {
-        var appUserId = User.GetAppUserId();
-        if (appUserId is null) return BadRequest(appUserId);
-        
-        var chatUser = await _chatUserService.GetOrRegister(appUserId);
-        var chats = await _chatUserRepository.GetChatsOfUser(chatUser.Id);
-        return Ok(chats);
+        var chats = await _chatService.GetAllChatsAsync(request, User);
+
+        var result = new GetAllChatsResult
+        {
+            Chats = chats.Select(_chatModelMapper.Create).ToArray()
+        };
+        return Ok(result);
     }
-
-
 
     [HttpPost]
     public async Task<IActionResult> CreateChat(
-        [FromQuery] string chatName,
-        [FromBody] string[] memberIds)
+        [FromBody] CreateChatRequest request)
     {
-        var appUserId = User.GetAppUserId();
-        if (appUserId is null) return BadRequest(appUserId);
-        
-        var chatUser = await _chatUserService.GetOrRegister(appUserId);
+        var chat = await _chatService.CreateChatAsync(request, User);
 
-        var chatMembers = new List<ChatUser> { chatUser};
-
-        foreach (var memberId in memberIds)
+        var result = new CreateChatResult()
         {
-            var member = await _chatUserRepository.GetByAppUserId(memberId);
-            if (member is not null)
-            {
-                chatMembers.Add(member);
-            }
-        }
-        
-        var newChat = new Chat()
-        {
-            Name = chatName,
-            ChatUsers = chatMembers
+            Chat = _chatModelMapper.Create(chat)
         };
-
-        await _chatRepository.SaveChat(newChat);
-        newChat.ChatUsers.Clear();
-        return Ok(newChat);
+        return Ok(result);
     }
     
     [HttpGet("{chatId}")]
     public async Task<IActionResult> GetChat(
-        [FromRoute] int chatId)
+        [FromRoute] int chatId,
+        [FromBody] GetChatRequest request)
     {
-        var chat = await _chatRepository.GetChatByIdAsync(chatId);
+        request.ChatId = chatId;
+        Chat? chat = await _chatService.GetChatAsync(request, User);
         if (chat is null) return NotFound();
-        foreach (var user in chat.ChatUsers)
+
+        var result = new GetChatResult
         {
-            user.Chats.Clear();
-        }
-        return Ok(chat);
+            Chat = _chatModelMapper.Create(chat)
+        };
+
+        return Ok(result);
     }
 
     [HttpPost("{chatId}/messages")]
-    public async Task<IActionResult> AddedMessageToChat(
-        [FromBody] string messageText,
-        [FromRoute] int chatId)
+    public async Task<IActionResult> PostMessage(
+        [FromRoute] int chatId,
+        [FromBody] PostChatMessageRequest request)
     {
-        var appUserId = User.GetAppUserId();
-        if (appUserId is null) return BadRequest(appUserId);
-        
-        var chatUser = await _chatUserService.GetOrRegister(appUserId);
-        
-        var chat = await _chatRepository.GetChatByIdAsync(chatId);
-        if (chat is null) return BadRequest(chat);
-        if (chat.ChatUsers.Contains(chatUser) is false)
-            return BadRequest(chat);
-        var message = new Message()
-        {
-            MessageText = messageText,
-            AuthorId = chatUser.Id,
-            Chat = chat,
-            DateTimeSent = DateTime.UtcNow
-        };
-        await _messageRepository.AddMessage(message);
-        return Ok(message);
+        request.ChatId = chatId;
 
+        ChatMessage message = await _chatMessageService.SendMessageAsync(request);
+        
+        var result = new PostChatMessageResult()
+        {
+            Message = _chatMessageModelMapper.Create(message)
+        };
+        return Ok(result);
     }
 
     /*[HttpPost("{chatId}/join")]
