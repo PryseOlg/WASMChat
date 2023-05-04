@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Client\WASMChat.Client.csproj" />
+    <ProjectReference Include="..\Data\WASMChat.Data.csproj" />
     <ProjectReference Include="..\Shared\WASMChat.Shared.csproj" />
   </ItemGroup>
 
@@ -31,10 +32,6 @@
     <PackageReference Include="Microsoft.AspNetCore.ApiAuthorization.IdentityServer" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\Migrations\" />
   </ItemGroup>
 
 </Project>
