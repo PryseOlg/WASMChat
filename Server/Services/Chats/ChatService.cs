@@ -28,7 +28,7 @@ public class ChatService : IService
     {
         var chat = await _chatRepository.GetChatByIdAsync(request.ChatId);
         NotFoundException.ThrowIfNull(chat, "Чат не найден");
-
+        
         var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         
         return chat.ChatUsers.Contains(user) ? 
@@ -44,7 +44,7 @@ public class ChatService : IService
         var members = request.MemberIds
             .Append(request.OwnerId)
             .Distinct()
-            .Select(async id => await _chatUserRepository.GetById(id))
+            .Select(async id => await _chatUserRepository.GetByIdAsync(id))
             .Select(task => task.Result)
             .ExcludeNulls()
             .ToArray();

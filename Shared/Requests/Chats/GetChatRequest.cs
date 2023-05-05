@@ -1,4 +1,6 @@
-﻿namespace WASMChat.Shared.Requests.Chats;
+﻿using System.Runtime.Serialization;
+
+namespace WASMChat.Shared.Requests.Chats;
 
 public class GetChatRequest
 {

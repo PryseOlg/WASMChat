@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WASMChat.Data.Entities.Chats;
 using WASMChat.Server.Mappers.Chats;
 using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
@@ -38,7 +37,7 @@ public class ChatsController : ControllerBase
         _chatUserModelMapper = chatUserModelMapper;
     }
     
-    [HttpGet("users")]
+    [HttpGet("users/current")]
     public async Task<IActionResult> GetChatUser(
         [FromQuery] GetChatUserRequest request)
     {
@@ -99,12 +98,24 @@ public class ChatsController : ControllerBase
         [FromBody] PostChatMessageRequest request)
     {
         request.ChatId = chatId;
-
-        ChatMessage message = await _chatMessageService.SendMessageAsync(request, HttpContext);
+        var message = await _chatMessageService.SendMessageAsync(request, HttpContext);
         
         var result = new PostChatMessageResult()
         {
             Message = _chatMessageModelMapper.Create(message)
+        };
+        return Ok(result);
+    }
+    
+    [HttpGet("users")]
+    public async Task<IActionResult> GetAllUsers(
+        [FromQuery] GetAllUsersRequest request)
+    {
+        var users = await _chatUserService.GetAllUsersAsync(request, HttpContext);
+
+        var result = new GetAllUsersResult()
+        {
+            Users = users.Select(_chatUserModelMapper.Create).ToArray()
         };
         return Ok(result);
     }

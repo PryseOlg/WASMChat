@@ -22,7 +22,7 @@ public class ChatUserService : IService
     public async ValueTask<ChatUser> GetOrRegisterAsync(string appUserId)
     {
         var existingUser = await _chatUserRepository
-            .GetByAppUserId(appUserId);
+            .GetByAppUserIdAsync(appUserId);
 
         if (existingUser is not null) return existingUser;
 
@@ -52,6 +52,11 @@ public class ChatUserService : IService
         request.AppUserId = appUserId;
 
         return GetOrRegisterAsync(request.AppUserId);
+    }
+
+    public ValueTask<IReadOnlyCollection<ChatUser>> GetAllUsersAsync(GetAllUsersRequest request, HttpContext _)
+    {
+        return _chatUserRepository.GetAllAsync(request.Page);
     }
 
     private static string GetUserName(ClaimsPrincipal principal)

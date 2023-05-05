@@ -1,0 +1,65 @@
+﻿@page "/chats/create"
+@using WASMChat.Shared.Models.Chats
+@using WASMChat.Shared.Requests.Chats
+@using WASMChat.Shared.Results.Chats
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<input type="text" maxlength="64" @bind="@_chatName"/>
+<select multiple @bind="@_memberIds">
+    @foreach (var user in _users)
+    {
+        <option value="@user.Id">@user.UserName</option>
+    }
+</select>
+<button @onclick="Submit">✅</button>
+
+@code {
+    
+    private string _chatName = "Название чата";
+    private int[] _memberIds = Array.Empty<int>();
+    private ChatUserModel[] _users = Array.Empty<ChatUserModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<GetAllUsersResult>("api/Chats/users");
+            _users = result!.Users;
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+            throw;
+        }
+    }
+
+    private async Task Submit()
+    {
+        if (FormIsIncomplete()) return;
+        var request = new CreateChatRequest()
+        {
+            ChatName = _chatName,
+            MemberIds = _memberIds
+        };
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/Chats", request);
+            var result = await response.Content.ReadFromJsonAsync<CreateChatResult>();
+
+            int newChatId = result!.Chat.Id;
+            NavigationManager.NavigateTo($"chats/{newChatId}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    private bool FormIsIncomplete() =>
+        string.IsNullOrWhiteSpace(_chatName) ||
+        _memberIds.Any() is false;
+
+}

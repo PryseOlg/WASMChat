@@ -7,6 +7,7 @@
 <PageTitle>Chats</PageTitle>
 
 <ChatUserComponent User="@_chatUser"></ChatUserComponent> <br/>
+<a href="chats/create">Создать новый чат</a><br/>
 <ChatListComponent Chats="@_chats"></ChatListComponent>
 
 @code {
@@ -21,7 +22,7 @@
 
         try
         {
-            var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users");
+            var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users/current");
             _chatUser = userResponse!.User;
 
             var chatsResponse = await Http.GetFromJsonAsync<GetAllChatsResult>("api/Chats");

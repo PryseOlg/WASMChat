@@ -1,0 +1,65 @@
+﻿@page "/chats/{ChatId:int}"
+@using WASMChat.Shared.Models.Chats
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using WASMChat.Shared.Requests.Chats
+@using WASMChat.Shared.Results.Chats
+@inject HttpClient Http
+
+<a href="/Chats/">⬅️ Назад</a>
+<button @onclick="@PullChat">🔃</button><br/>
+
+@if (_chat is not null)
+{
+    @foreach (var msg in _chat.Messages.OrderByDescending(m => m.SentTime))
+    {
+        <ChatMessageComponent Message="@msg"/>
+    }
+    
+    <textarea @bind="@_typedMessage" maxlength="2000"></textarea><br/>
+    <button @onclick="@SendMessage">📨</button>
+}
+
+@code {
+    [Parameter]
+    public int ChatId { get; set; }
+    private ChatModel? _chat;
+
+    private string _typedMessage = string.Empty;
+
+    protected override Task OnInitializedAsync() => PullChat();
+
+    private async Task PullChat()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
+            _chat = result!.Chat;
+        }
+        catch (AccessTokenNotAvailableException e)
+        {
+            e.Redirect();
+        }
+    }
+    private async Task SendMessage()
+    {
+        if (_chat is null) return;
+        
+        var request = new PostChatMessageRequest()
+        {
+            Text = _typedMessage,
+        };
+
+        try
+        {
+            await Http.PostAsJsonAsync($"api/Chats/{_chat.Id}/messages", request);
+            _typedMessage = string.Empty;
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+            throw;
+        }
+
+        await PullChat();
+    }
+}
