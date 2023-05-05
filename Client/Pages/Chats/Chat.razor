@@ -28,65 +28,6 @@
     </div>
 </div>
 
-<style> {/* Понять почему файл из css не подсосался к коду*/}
-    .chat-container {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        background: #aae8f5;
-        padding: 10px;
-        border-radius: 20px;
-    }
-    
-    .message {
-    background: #b1dcff;
-      border-radius: 10px;
-      padding: 5px;
-      max-width: 400px;
-      margin: 20px;
-    }
-    
-    .refresh-button {
-        margin-top: 5px;
-        margin-bottom: 5px;
-        border: hidden;
-        border-radius: 15px;
-    }
-    .chat-messages-container {
-        overflow-y: auto;
-        flex: 1;
-        margin-bottom: 5px;
-        padding: 15px;
-        background-color: #f2f2f2;
-        border-radius: 15px;
-    }
-    .chat-input-container {
-        display: flex;
-        align-items: center;
-        margin-bottom: 5px;
-    }
-    .message-input {
-        flex: 1;
-        padding: 10px;
-        margin-right: 5px;
-        border-radius: 15px;
-        border: 1px solid #ccc;
-        resize: none;
-        font-size: 16px;
-        background: #f9f3ff;
-    }
-    .send-button {
-        padding: 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-    }
-    .send-button:hover {
-        background-color: #3e8e41;
-    }
-</style>
 
 @code {
     [Parameter]
