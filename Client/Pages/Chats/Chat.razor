@@ -5,19 +5,88 @@
 @using WASMChat.Shared.Results.Chats
 @inject HttpClient Http
 
-<a href="/Chats/">⬅️ Назад</a>
-<button @onclick="@PullChat">🔃</button><br/>
+<link href="../../Client/Pages/Chats/Chat.razor.css" rel="stylesheet"/>
 
-@if (_chat is not null)
-{
-    @foreach (var msg in _chat.Messages.OrderByDescending(m => m.SentTime))
-    {
-        <ChatMessageComponent Message="@msg"/>
+<div class="chat-container">
+    <a href="/Chats/">⬅️ Назад</a>
+    <button class="refresh-button" @onclick="@PullChat">🔃</button>
+    <div class="chat-messages-container">
+        @if (_chat is not null)
+        {
+            @foreach (var msg in _chat.Messages.OrderBy(m => m.SentTime))
+            {
+                <div class="message">
+                    <ChatMessageComponent Message="@msg"/>
+                </div>
+                
+            }
+        }
+    </div>
+    <div class="chat-input-container">
+        <textarea class="message-input" @bind="@_typedMessage" maxlength="2000"></textarea>
+        <button class="send-button" @onclick="@SendMessage">📨</button>
+    </div>
+</div>
+
+<style> {/* Понять почему файл из css не подсосался к коду*/}
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #aae8f5;
+        padding: 10px;
+        border-radius: 20px;
     }
     
-    <textarea @bind="@_typedMessage" maxlength="2000"></textarea><br/>
-    <button @onclick="@SendMessage">📨</button>
-}
+    .message {
+    background: #b1dcff;
+      border-radius: 10px;
+      padding: 5px;
+      max-width: 400px;
+      margin: 20px;
+    }
+    
+    .refresh-button {
+        margin-top: 5px;
+        margin-bottom: 5px;
+        border: hidden;
+        border-radius: 15px;
+    }
+    .chat-messages-container {
+        overflow-y: auto;
+        flex: 1;
+        margin-bottom: 5px;
+        padding: 15px;
+        background-color: #f2f2f2;
+        border-radius: 15px;
+    }
+    .chat-input-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+    .message-input {
+        flex: 1;
+        padding: 10px;
+        margin-right: 5px;
+        border-radius: 15px;
+        border: 1px solid #ccc;
+        resize: none;
+        font-size: 16px;
+        background: #f9f3ff;
+    }
+    .send-button {
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+    .send-button:hover {
+        background-color: #3e8e41;
+    }
+</style>
 
 @code {
     [Parameter]
