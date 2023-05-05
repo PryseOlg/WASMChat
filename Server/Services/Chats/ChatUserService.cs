@@ -1,8 +1,8 @@
-﻿using System.Security.Authentication;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Exceptions;
+using WASMChat.Shared.Requests.Chats;
 
 namespace WASMChat.Server.Services.Chats;
 
@@ -19,7 +19,7 @@ public class ChatUserService : IService
         _chatUserRepository = chatUserRepository;
     }
     
-    public async Task<ChatUser> GetOrRegister(string appUserId)
+    public async ValueTask<ChatUser> GetOrRegisterAsync(string appUserId)
     {
         var existingUser = await _chatUserRepository
             .GetByAppUserId(appUserId);
@@ -27,7 +27,7 @@ public class ChatUserService : IService
         if (existingUser is not null) return existingUser;
 
         var appUser = await _applicationUserRepository.GetById(appUserId);
-        if (appUser is null) throw new AuthenticationException();
+        UnauthorizedException.ThrowIfNull(appUser);
 
         var newUser = new ChatUser
         {
@@ -40,9 +40,20 @@ public class ChatUserService : IService
         return newUser;
     }
 
-    public Task<ChatUser> GetOrRegister(ClaimsPrincipal principal)
+    public ValueTask<ChatUser> GetOrRegisterAsync(ClaimsPrincipal principal)
     {
-        var appUserId = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedException();
-        return GetOrRegister(appUserId);
+        var appUserId = GetUserName(principal);
+        return GetOrRegisterAsync(appUserId);
     }
+
+    public ValueTask<ChatUser> GetUserAsync(GetChatUserRequest request, HttpContext ctx)
+    {
+        var appUserId = GetUserName(ctx.User);
+        request.AppUserId = appUserId;
+
+        return GetOrRegisterAsync(request.AppUserId);
+    }
+
+    private static string GetUserName(ClaimsPrincipal principal)
+        => principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedException();
 }

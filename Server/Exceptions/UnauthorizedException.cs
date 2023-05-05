@@ -1,4 +1,6 @@
-﻿namespace WASMChat.Server.Exceptions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace WASMChat.Server.Exceptions;
 
 public class UnauthorizedException : Exception
 {
@@ -6,5 +8,13 @@ public class UnauthorizedException : Exception
     
     public UnauthorizedException(string? message = null) : base(message ?? DefaultMessage)
     {
+    }
+    
+    public static void ThrowIfNull([NotNull] object? param, string? message = null)
+    {
+        if (param is null)
+        {
+            throw new UnauthorizedException(message);
+        }
     }
 }

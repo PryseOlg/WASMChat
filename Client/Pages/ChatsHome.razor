@@ -1,0 +1,40 @@
+﻿@page "/chats/"
+@using WASMChat.Shared.Models.Chats
+@using WASMChat.Shared.Results.Chats
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject HttpClient Http
+
+<PageTitle>Chats</PageTitle>
+
+<ChatUserComponent User="@_chatUser"></ChatUserComponent> <br/>
+<ChatListComponent Chats="@_chats"></ChatListComponent>
+
+@code {
+    private ChatUserModel? _chatUser;
+    private List<ChatModel>? _chats;
+    
+    [Parameter]
+    public int ChatId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        try
+        {
+            var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users");
+            _chatUser = userResponse!.User;
+
+            var chatsResponse = await Http.GetFromJsonAsync<GetAllChatsResult>("api/Chats");
+            _chats = chatsResponse!.Chats.ToList();
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+        }
+    }
+
+}

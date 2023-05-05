@@ -1,6 +1,8 @@
-﻿using System.Security.Claims;
+﻿using System.Security.Authentication;
+using System.Security.Claims;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Data.Repositories;
+using WASMChat.Server.Exceptions;
 using WASMChat.Server.Extensions;
 using WASMChat.Shared.Requests.Chats;
 
@@ -22,19 +24,21 @@ public class ChatService : IService
         _chatUserRepository = chatUserRepository;
     }
 
-    public async ValueTask<Chat?> GetChatAsync(GetChatRequest request, ClaimsPrincipal principal)
+    public async ValueTask<Chat> GetChatAsync(GetChatRequest request, HttpContext ctx)
     {
         var chat = await _chatRepository.GetChatByIdAsync(request.ChatId);
-        if (chat is null) return chat;
+        NotFoundException.ThrowIfNull(chat, "Чат не найден");
 
-        var user = await _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         
-        return chat.ChatUsers.Contains(user) ? chat : null;
+        return chat.ChatUsers.Contains(user) ? 
+            chat : 
+            throw new AuthenticationException("У вас нет прав на просмотр этого чата");
     }
 
-    public async ValueTask<Chat> CreateChatAsync(CreateChatRequest request, ClaimsPrincipal principal)
+    public async ValueTask<Chat> CreateChatAsync(CreateChatRequest request, HttpContext ctx)
     {
-        var user = await _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         request.OwnerId = user.Id;
 
         var members = request.MemberIds
@@ -57,9 +61,9 @@ public class ChatService : IService
         return chat;
     }
 
-    public async ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(GetAllChatsRequest request, ClaimsPrincipal principal)
+    public async ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(GetAllChatsRequest request, HttpContext ctx)
     {
-        var user = await _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         request.UserId = user.Id;
 
         return await _chatRepository.GetAllChats(request.UserId, request.Page);

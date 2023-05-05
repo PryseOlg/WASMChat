@@ -1,0 +1,11 @@
+﻿@using WASMChat.Shared.Models.Chats
+
+@if (User is not null)
+{
+    <h4>@User.UserName<b>#@User.Id</b></h4>
+}
+
+@code {
+    [Parameter]
+    public ChatUserModel? User { get; set; }
+}

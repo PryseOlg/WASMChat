@@ -1,0 +1,43 @@
+﻿@using WASMChat.Shared.Models.Chats
+@using System.Diagnostics.CodeAnalysis
+@using WASMChat.Shared.Requests.Chats
+@inject HttpClient Http
+
+@if (Chat is not null)
+{
+    @foreach (var msg in Chat.Messages.OrderByDescending(m => m.SentTime))
+    {
+        <ChatMessageComponent Message="@msg"/>
+    }
+    
+    <textarea @bind="@_typedMessage" maxlength="2000"></textarea><br/>
+    <button @onclick="@SendMessage">📨</button>
+}
+
+@code {
+    [Parameter]
+    public ChatModel? Chat { get; set; }
+
+    private string _typedMessage = string.Empty;
+
+    private async Task SendMessage()
+    {
+        if (Chat is null) return;
+        
+        var request = new PostChatMessageRequest()
+        {
+            Text = _typedMessage,
+        };
+
+        try
+        {
+            await Http.PostAsJsonAsync($"api/Chats/{Chat.Id}/messages", request);
+            _typedMessage = string.Empty;
+        }
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+            throw;
+        }
+    }
+}

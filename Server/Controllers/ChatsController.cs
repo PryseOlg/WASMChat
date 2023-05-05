@@ -15,25 +15,47 @@ public class ChatsController : ControllerBase
 {
     private readonly ChatMessageService _chatMessageService;
     private readonly ChatMessageModelMapper _chatMessageModelMapper;
-    private readonly ChatModelMapper _chatModelMapper;
+    
     private readonly ChatService _chatService;
+    private readonly ChatModelMapper _chatModelMapper;
 
-    public ChatsController(ChatMessageService chatMessageService, 
+    private readonly ChatUserService _chatUserService;
+    private readonly ChatUserModelMapper _chatUserModelMapper;
+
+    public ChatsController(
+        ChatMessageService chatMessageService, 
         ChatMessageModelMapper chatMessageModelMapper, 
-        ChatModelMapper chatModelMapper, 
-        ChatService chatService)
+        ChatService chatService, 
+        ChatModelMapper chatModelMapper,
+        ChatUserService chatUserService, 
+        ChatUserModelMapper chatUserModelMapper)
     {
         _chatMessageService = chatMessageService;
         _chatMessageModelMapper = chatMessageModelMapper;
-        _chatModelMapper = chatModelMapper;
         _chatService = chatService;
+        _chatModelMapper = chatModelMapper;
+        _chatUserService = chatUserService;
+        _chatUserModelMapper = chatUserModelMapper;
+    }
+    
+    [HttpGet("users")]
+    public async Task<IActionResult> GetChatUser(
+        [FromQuery] GetChatUserRequest request)
+    {
+        var user = await _chatUserService.GetUserAsync(request, HttpContext);
+
+        var result = new GetChatUserResult
+        {
+            User = _chatUserModelMapper.Create(user)
+        };
+        return Ok(result);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetChats(
         [FromQuery] GetAllChatsRequest request)
     {
-        var chats = await _chatService.GetAllChatsAsync(request, User);
+        var chats = await _chatService.GetAllChatsAsync(request, HttpContext);
 
         var result = new GetAllChatsResult
         {
@@ -42,11 +64,27 @@ public class ChatsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("{chatId:int}")]
+    public async Task<IActionResult> GetChat(
+        [FromRoute] int chatId,
+        [FromQuery] GetChatRequest request)
+    {
+        request.ChatId = chatId;
+        var chat = await _chatService.GetChatAsync(request, HttpContext);
+
+        var result = new GetChatResult
+        {
+            Chat = _chatModelMapper.Create(chat)
+        };
+        return Ok(result);
+    }
+    
+    
     [HttpPost]
     public async Task<IActionResult> CreateChat(
         [FromBody] CreateChatRequest request)
     {
-        var chat = await _chatService.CreateChatAsync(request, User);
+        var chat = await _chatService.CreateChatAsync(request, HttpContext);
 
         var result = new CreateChatResult()
         {
@@ -54,32 +92,15 @@ public class ChatsController : ControllerBase
         };
         return Ok(result);
     }
-    
-    [HttpGet("{chatId}")]
-    public async Task<IActionResult> GetChat(
-        [FromRoute] int chatId,
-        [FromQuery] GetChatRequest request)
-    {
-        request.ChatId = chatId;
-        Chat? chat = await _chatService.GetChatAsync(request, User);
-        if (chat is null) return NotFound();
 
-        var result = new GetChatResult
-        {
-            Chat = _chatModelMapper.Create(chat)
-        };
-
-        return Ok(result);
-    }
-
-    [HttpPost("{chatId}/messages")]
+    [HttpPost("{chatId:int}/messages")]
     public async Task<IActionResult> PostMessage(
         [FromRoute] int chatId,
         [FromBody] PostChatMessageRequest request)
     {
         request.ChatId = chatId;
 
-        ChatMessage message = await _chatMessageService.SendMessageAsync(request, User);
+        ChatMessage message = await _chatMessageService.SendMessageAsync(request, HttpContext);
         
         var result = new PostChatMessageResult()
         {
@@ -87,25 +108,4 @@ public class ChatsController : ControllerBase
         };
         return Ok(result);
     }
-
-    /*[HttpPost("{chatId}/join")]
-    public async Task<IActionResult> JoinChat(
-        [FromRoute] int chatId)
-    {
-        var appUserId = User.GetAppUserId();
-        if (appUserId is null) return BadRequest(appUserId);
-        
-        var chatUser = await _chatUserService.GetOrRegister(appUserId);
-        
-        var chat = await _chatRepository.GetChatByIdAsync(chatId);
-        if (chat is null) return BadRequest(chat);
-        
-        chatUser.Chats.Add(chat);
-        await _chatUserRepository.Update(chatUser);
-        return Ok();
-    }*/
-    
-    
-
-
 }

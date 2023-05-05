@@ -1,9 +1,13 @@
 ﻿@using WASMChat.Shared.Models.Chats
-<h6 class="author">@Message.Author.UserName</h6>
-@Message.Text
+@using System.Diagnostics.CodeAnalysis
+
+<p>
+    @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.ToLocalTime()<br/>
+    @Message.Text
+</p>
 
 @code {
-    [Parameter]
-    public ChatMessageModel Message { get; set; }
+    [Parameter, NotNull]
+    public ChatMessageModel? Message { get; set; }
     
 }

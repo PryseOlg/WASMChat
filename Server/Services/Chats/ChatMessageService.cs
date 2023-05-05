@@ -18,9 +18,9 @@ public class ChatMessageService : IService
         _chatUserService = chatUserService;
     }
 
-    public async ValueTask<ChatMessage> SendMessageAsync(PostChatMessageRequest request, ClaimsPrincipal principal)
+    public async ValueTask<ChatMessage> SendMessageAsync(PostChatMessageRequest request, HttpContext ctx)
     {
-        var user = await _chatUserService.GetOrRegister(principal);
+        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         request.AuthorId = user.Id;
         
         ChatMessage message = new()

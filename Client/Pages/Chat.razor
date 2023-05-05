@@ -1,41 +1,31 @@
-﻿@page "/chat/{ChatId:int}"
+﻿@page "/Chats/{ChatId:int}"
 @using WASMChat.Shared.Models.Chats
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @using WASMChat.Shared.Results.Chats
 @inject HttpClient Http
 
-<h3>Chat</h3>
-
-@if (ChatModel is null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    @ChatModel.Name
-    @foreach (var msg in ChatModel.Messages)
-    {
-        <ChatMessageComponent Message=msg/>
-    }
-}
+<a href="/Chats/">⬅️ Назад</a>
+<button @onclick="@PullChat">🔃</button><br/>
+<ChatComponent Chat="@_chat"/>
 
 @code {
-    public ChatModel? ChatModel { get; set; }
-    
     [Parameter]
     public int ChatId { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
+    private ChatModel? _chat;
 
+    protected override Task OnInitializedAsync() => PullChat();
+
+    private async Task PullChat()
+    {
         try
         {
-            var response = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
-            ChatModel = response!.Chat;
+            var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
+            _chat = result!.Chat;
         }
-        catch (Exception e)
+        catch (AccessTokenNotAvailableException e)
         {
-            Console.WriteLine(e);
+            e.Redirect();
         }
     }
-
 }
