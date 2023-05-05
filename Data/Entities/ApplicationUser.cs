@@ -5,5 +5,5 @@ namespace WASMChat.Data.Entities;
 
 public class ApplicationUser : IdentityUser
 {
-    public ChatUser ChatUser { get; set; }
+    public ChatUser? ChatUser { get; set; }
 }

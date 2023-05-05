@@ -1,5 +1,6 @@
 ﻿using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -39,6 +40,9 @@ public class Startup
 
         services.AddIdentityServer()
             .AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+
+        services.AddDataProtection()
+            .PersistKeysToDbContext<ApplicationDbContext>();
 
         services.AddAuthentication()
             .AddCustomOAuth(_config)
