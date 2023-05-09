@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using WASMChat.Data.Entities;
+using WASMChat.Data.Entities.Abstractions;
 using WASMChat.Data.Entities.Chats;
 
 namespace WASMChat.Data;
@@ -35,5 +36,20 @@ public class ApplicationDbContext :
         base.OnModelCreating(builder);
 
         builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    {
+        var softDeletedEntries = ChangeTracker
+            .Entries<ISoftDeletable>()
+            .Where(i => i.State == EntityState.Deleted);
+        foreach (var softDeleted in softDeletedEntries)
+        {
+            softDeleted.State = EntityState.Unchanged;
+            softDeleted.Property(i => i.IsDeleted).CurrentValue = true;
+            softDeleted.Property(i => i.DeletedTime).CurrentValue = DateTimeOffset.UtcNow;
+        }
+        
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 }

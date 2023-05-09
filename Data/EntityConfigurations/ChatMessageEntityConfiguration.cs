@@ -17,5 +17,7 @@ public class ChatMessageEntityConfiguration: IEntityTypeConfiguration<ChatMessag
 
         builder.Property(x => x.DateTimeSent)
             .ValueGeneratedOnAdd();
+        
+        builder.HasQueryFilter(x => x.IsDeleted == false);
     }
 }

@@ -23,5 +23,7 @@ public class ChatEntityConfiguration: IEntityTypeConfiguration<Chat>
         builder.HasOne(x => x.Owner)
             .WithMany()
             .HasForeignKey(x => x.OwnerId);
+
+        builder.HasQueryFilter(x => x.IsDeleted == false);
     }
 }

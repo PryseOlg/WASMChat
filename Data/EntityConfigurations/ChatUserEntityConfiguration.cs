@@ -19,5 +19,7 @@ public class ChatUserEntityConfiguration: IEntityTypeConfiguration<ChatUser>
         builder.HasMany(x => x.Messages)
             .WithOne(x => x.Author)
             .HasForeignKey(x => x.AuthorId);
+        
+        builder.HasQueryFilter(x => x.IsDeleted == false);
     }
 }

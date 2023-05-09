@@ -405,6 +405,12 @@ namespace WASMChat.Server.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -437,6 +443,12 @@ namespace WASMChat.Server.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("MessageText")
                         .IsRequired()
                         .HasMaxLength(2000)
@@ -462,6 +474,12 @@ namespace WASMChat.Server.Data.Migrations
                     b.Property<string>("ApplicationUserId")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("DeletedTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -584,8 +602,7 @@ namespace WASMChat.Server.Data.Migrations
 
             modelBuilder.Entity("WASMChat.Data.Entities.ApplicationUser", b =>
                 {
-                    b.Navigation("ChatUser")
-                        .IsRequired();
+                    b.Navigation("ChatUser");
                 });
 
             modelBuilder.Entity("WASMChat.Data.Entities.Chats.Chat", b =>

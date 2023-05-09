@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WASMChat.Data.Entities.Abstractions;
 
 namespace WASMChat.Data.Entities.Chats;
 
-public class ChatMessage
+public class ChatMessage : ISoftDeletable
 {
     public int Id { get; set; }
     
@@ -15,4 +16,8 @@ public class ChatMessage
     
     public Chat? Chat { get; set; }
     public int ChatId { get; set; }
+    
+    public bool IsDeleted { get; set; }
+    
+    public DateTimeOffset? DeletedTime { get; set; }
 }

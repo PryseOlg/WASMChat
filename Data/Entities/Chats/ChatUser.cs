@@ -1,6 +1,8 @@
-﻿namespace WASMChat.Data.Entities.Chats;
+﻿using WASMChat.Data.Entities.Abstractions;
 
-public class ChatUser
+namespace WASMChat.Data.Entities.Chats;
+
+public class ChatUser : ISoftDeletable
 {
     public int Id { get; set; }
     
@@ -13,4 +15,8 @@ public class ChatUser
     public ICollection<Chat> Chats { get; set; } = new List<Chat>();
 
     public ICollection<ChatMessage> Messages { get; set; } = new List<ChatMessage>();
+    
+    public bool IsDeleted { get; set; }
+    
+    public DateTimeOffset? DeletedTime { get; set; }
 }
