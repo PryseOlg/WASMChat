@@ -48,7 +48,7 @@ public class Startup
             .PersistKeysToDbContext<ApplicationDbContext>();
 
         services.AddAuthentication()
-            .AddCustomOAuth(_config)
+            .AddCustomOAuth(_config.GetSection("Authentication"))
             .AddIdentityServerJwt();
 
         services.AddControllersWithViews()

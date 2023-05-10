@@ -12,25 +12,24 @@ namespace WASMChat.Server;
 /// </summary>
 public static class OAuth
 {
-    public static AuthenticationBuilder AddCustomOAuth(this AuthenticationBuilder auth, IConfiguration config)
+    public static AuthenticationBuilder AddCustomOAuth(this AuthenticationBuilder auth, IConfigurationSection config)
     {
-        IConfigurationSection authConfig = config.GetSection("Authentication");
-        if (authConfig.Exists() is false) return auth;
+        if (config.Exists() is false) return auth;
 
-        TryAddOAuth<GoogleOptions>(authConfig, "Google", auth.AddGoogle);
-        TryAddOAuth<YandexAuthenticationOptions>(authConfig, "Yandex", auth.AddYandex);
-        TryAddOAuth<DiscordAuthenticationOptions>(authConfig, "Discord", auth.AddDiscord);
+        TryAddOAuth<GoogleOptions>(config, "Google", auth.AddGoogle);
+        TryAddOAuth<YandexAuthenticationOptions>(config, "Yandex", auth.AddYandex);
+        TryAddOAuth<DiscordAuthenticationOptions>(config, "Discord", auth.AddDiscord);
 
         return auth;
     }
     
     private static void TryAddOAuth<TOptions>(
-        IConfiguration authConfig, 
+        IConfiguration config, 
         string name,
         Func<Action<TOptions>, AuthenticationBuilder> addOAuthDelegate)
         where TOptions : OAuthOptions
     {
-        if (TryGetConfiguration(authConfig, name, out var clientId, out var clientSecret) is false) 
+        if (TryGetConfiguration(config, name, out var clientId, out var clientSecret) is false) 
             return;
         
         string callbackPath = $"/signin-{name.ToLower()}";
