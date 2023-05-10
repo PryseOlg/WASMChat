@@ -2,12 +2,20 @@
 @using System.Diagnostics.CodeAnalysis
 
 <p>
-    @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.ToLocalTime()<br/>
+    <span style="color: @GetHexColor()">
+        @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.ToLocalTime()
+    </span><br/>
     @Message.Text
 </p>
 
 @code {
     [Parameter, NotNull]
     public ChatMessageModel? Message { get; set; }
-    
+
+    private string GetHexColor()
+    {
+        int colorBytes = Message.Author.UserName.GetHashCode();
+        colorBytes |= 0x00ffffff;
+        return $"#{Convert.ToString(colorBytes, toBase: 16)}";
+    }
 }
