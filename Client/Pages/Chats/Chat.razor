@@ -9,8 +9,6 @@
 @inject NavigationManager NavigationManager
 @inject ILogger<Chat> Logger
 
-<link href="../../Client/Pages/Chats/Chat.razor.css" rel="stylesheet"/>
-
 @(_hubConnection?.State == HubConnectionState.Connected ? "🟢" : "🔴")
 
 <div class="chat-container">
@@ -21,7 +19,7 @@
         {
             @foreach (var msg in _messages!.OrderBy(m => m.SentTime))
             {
-                <div class="message">
+                <div class='@(msg.Author.Id == _chatUser!.Id ? "message-author" : "message-other")'>
                     <ChatMessageComponent Message="@msg"/>
                 </div>
             }
@@ -37,6 +35,7 @@
 @code {
     [Parameter]
     public int ChatId { get; set; }
+    private ChatUserModel? _chatUser;
     private ChatModel? _chat;
     private List<ChatMessageModel>? _messages;
     private HubConnection? _hubConnection;
@@ -45,6 +44,10 @@
 
     protected override async Task OnInitializedAsync()
     {
+        
+        var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users/current");
+        _chatUser = userResponse!.User;
+        
         var hubUri = $"/api/Chats/{ChatId}/hub";
         
         Logger.LogInformation("Attempting to connect to hub by uri {Address}",
@@ -108,4 +111,7 @@
 
         // await PullMessagesAsync();
     }
+    
+    
 }
+
