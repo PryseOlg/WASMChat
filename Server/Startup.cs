@@ -1,12 +1,14 @@
 ﻿using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WASMChat.Data.Entities;
 using WASMChat.Data;
 using WASMChat.Data.Repositories;
+using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers;
 using WASMChat.Server.Services;
 using WASMChat.Server.Validators;
@@ -59,6 +61,13 @@ public class Startup
         services.AddServices();
         services.AddValidators();
         services.AddMappers();
+        
+        services.AddSignalR();
+        services.AddResponseCompression(opts =>
+        {
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                new[] { "application/octet-stream" });
+        });
 
         services.AddMediatR(mediatr =>
         {
@@ -70,6 +79,8 @@ public class Startup
 
     public void Configure(IApplicationBuilder app)
     {
+        app.UseResponseCompression();
+        
         if (_env.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -101,6 +112,7 @@ public class Startup
 
         app.UseEndpoints(e =>
         {
+            e.MapHub<ChatHub>("api/Chats/{chatId:int}/hub");
             e.MapRazorPages();
             e.MapControllers();
             e.MapFallbackToFile("index.html");

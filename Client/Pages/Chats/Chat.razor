@@ -1,29 +1,34 @@
 ﻿@page "/chats/{ChatId:int}"
 @using WASMChat.Shared.Models.Chats
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.SignalR.Client
+@using WASMChat.Shared.HubClients
 @using WASMChat.Shared.Requests.Chats
 @using WASMChat.Shared.Results.Chats
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject ILogger<Chat> Logger
 
 <link href="../../Client/Pages/Chats/Chat.razor.css" rel="stylesheet"/>
 
+@(_hubConnection?.State == HubConnectionState.Connected ? "🟢" : "🔴")
+
 <div class="chat-container">
     <a href="/Chats/">⬅️ Назад</a>
-    <button class="refresh-button" @onclick="@PullChat">🔃</button>
+    <button class="refresh-button" @onclick="@PullMessagesAsync">🔃</button>
     <div class="chat-messages-container">
         @if (_chat is not null)
         {
-            @foreach (var msg in _chat.Messages.OrderBy(m => m.SentTime))
+            @foreach (var msg in _messages!.OrderBy(m => m.SentTime))
             {
                 <div class="message">
                     <ChatMessageComponent Message="@msg"/>
                 </div>
-                
             }
         }
     </div>
     <div class="chat-input-container">
-        <textarea class="message-input" @bind="@_typedMessage" maxlength="2000"></textarea>
+        <textarea class="message-input" @bind="@_typedMessage" minlength="1" maxlength="2000"></textarea>
         <button class="send-button" @onclick="@SendMessage">📨</button>
     </div>
 </div>
@@ -33,17 +38,47 @@
     [Parameter]
     public int ChatId { get; set; }
     private ChatModel? _chat;
+    private List<ChatMessageModel>? _messages;
+    private HubConnection? _hubConnection;
 
     private string _typedMessage = string.Empty;
 
-    protected override Task OnInitializedAsync() => PullChat();
+    protected override async Task OnInitializedAsync()
+    {
+        var hubUri = $"/api/Chats/{ChatId}/hub";
+        
+        Logger.LogInformation("Attempting to connect to hub by uri {Address}",
+            hubUri);
+        
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri(hubUri))
+            .Build();
 
-    private async Task PullChat()
+        var actionName = nameof(IChatHubClient.ReceiveMessage);
+        Logger.LogInformation("Subscribing to action {Action}",
+            actionName);
+        
+        _hubConnection.On<PostChatMessageResult>(actionName, result =>
+        {
+            Logger.LogInformation("Received message result - {Message}",
+                result);
+            if (result.Message.ChatId != _chat!.Id) return;
+            _messages!.Add(result.Message);
+            StateHasChanged();
+        });
+        
+        await PullMessagesAsync();
+
+        await _hubConnection.StartAsync();
+    }
+
+    private async Task PullMessagesAsync()
     {
         try
         {
             var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
             _chat = result!.Chat;
+            _messages = _chat.Messages.ToList();
         }
         catch (AccessTokenNotAvailableException e)
         {
@@ -53,8 +88,9 @@
     private async Task SendMessage()
     {
         if (_chat is null) return;
+        if (string.IsNullOrWhiteSpace(_typedMessage)) return;
         
-        var request = new PostChatMessageRequest()
+        var request = new PostChatMessageRequest
         {
             Text = _typedMessage,
         };
@@ -70,6 +106,6 @@
             throw;
         }
 
-        await PullChat();
+        // await PullMessagesAsync();
     }
 }

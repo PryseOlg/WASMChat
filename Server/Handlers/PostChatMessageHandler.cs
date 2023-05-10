@@ -1,8 +1,11 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Server.Extensions;
+using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers.Chats;
 using WASMChat.Server.Services.Chats;
+using WASMChat.Shared.HubClients;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
 
@@ -14,17 +17,20 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
     private readonly ChatMessageModelMapper _chatMessageModelMapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ChatUserService _chatUserService;
+    private readonly IHubContext<ChatHub, IChatHubClient> _hubContext;
 
     public PostChatMessageHandler(
         ChatMessageService chatMessageService, 
         ChatMessageModelMapper chatMessageModelMapper, 
         IHttpContextAccessor httpContextAccessor, 
-        ChatUserService chatUserService)
+        ChatUserService chatUserService, 
+        IHubContext<ChatHub, IChatHubClient> hubContext)
     {
         _chatMessageService = chatMessageService;
         _chatMessageModelMapper = chatMessageModelMapper;
         _httpContextAccessor = httpContextAccessor;
         _chatUserService = chatUserService;
+        _hubContext = hubContext;
     }
 
     public async Task<PostChatMessageResult> Handle(PostChatMessageRequest request, CancellationToken cancellationToken)
@@ -43,6 +49,10 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
         {
             Message = _chatMessageModelMapper.Create(message)
         };
+
+        await _hubContext.Clients
+            .Group($"Chat_{request.ChatId}")
+            .ReceiveMessage(result);
         return result;
     }
 }
