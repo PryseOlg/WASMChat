@@ -28,7 +28,7 @@
         }
     </div>
     <div class="chat-input-container">
-        <textarea class="message-input" @bind="@_typedMessage" minlength="1" maxlength="2000"></textarea>
+        <textarea class="message-input" @bind="@_typedMessage" minlength="1" maxlength="@PostChatMessageRequest.MaxTextLength"></textarea>
         <button class="send-button" @onclick="@SendMessage">📨</button>
     </div>
 </div>
