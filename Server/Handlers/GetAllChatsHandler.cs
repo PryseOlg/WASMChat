@@ -32,7 +32,7 @@ public class GetAllChatsHandler : IRequestHandler<GetAllChatsRequest, GetAllChat
         HttpContext ctx = _httpContextAccessor.GetContext();
         
         ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request.UserId = user.Id;
+        request = request with { UserId = user.Id };
         
         var chats = await _chatService.GetAllChatsAsync(request.UserId, request.Page);
         

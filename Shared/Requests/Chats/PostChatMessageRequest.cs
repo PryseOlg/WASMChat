@@ -6,8 +6,8 @@ namespace WASMChat.Shared.Requests.Chats;
 
 public record PostChatMessageRequest : IRequest<PostChatMessageResult>
 {
-    public int AuthorId { get; set; }
-    public int ChatId { get; set; }
+    public int AuthorId { get; init; }
+    public int ChatId { get; init; }
     [MaxLength(2000)]
-    public required string Text { get; set; }
+    public required string Text { get; init; }
 }

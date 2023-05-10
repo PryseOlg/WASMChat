@@ -31,15 +31,15 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
     {
         HttpContext ctx = _httpContextAccessor.GetContext();
         
-        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request.AuthorId = user.Id;
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
+        request = request with { AuthorId = user.Id };
 
         ChatMessage message = await _chatMessageService.SendMessageAsync(
             request.Text, 
             request.AuthorId, 
             request.ChatId);
         
-        var result = new PostChatMessageResult()
+        var result = new PostChatMessageResult
         {
             Message = _chatMessageModelMapper.Create(message)
         };
