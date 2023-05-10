@@ -17,9 +17,9 @@
     <div class="chat-messages-container">
         @if (_chat is not null)
         {
-            @foreach (var msg in _messages!.OrderBy(m => m.SentTime))
+            @foreach (var msg in _messages!.Distinct().OrderBy(m => m.SentTime))
             {
-                <div class='@(msg.Author.Id == _chatUser!.Id ? "message-author" : "message-other")'>
+                <div class='@(msg.Author.Id == _currentUser!.Id ? "message-author" : "message-other")'>
                     <ChatMessageComponent Message="@msg"/>
                 </div>
             }
@@ -35,7 +35,7 @@
 @code {
     [Parameter]
     public int ChatId { get; set; }
-    private ChatUserModel? _chatUser;
+    private ChatUserModel? _currentUser;
     private ChatModel? _chat;
     private List<ChatMessageModel>? _messages;
     private HubConnection? _hubConnection;
@@ -44,10 +44,27 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
-        var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users/current");
-        _chatUser = userResponse!.User;
-        
+        await ConnectToHubAsync();
+        await PullMessagesAsync();
+    }
+
+    private async Task PullMessagesAsync()
+    {
+        try
+        {
+            var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
+            _chat = result!.Chat;
+            _messages = _chat.Messages.ToList();
+            _currentUser = result.CurrentUser;
+        }
+        catch (AccessTokenNotAvailableException e)
+        {
+            e.Redirect();
+        }
+    }
+
+    private async Task ConnectToHubAsync()
+    {
         var hubUri = $"/api/Chats/{ChatId}/hub";
         
         Logger.LogInformation("Attempting to connect to hub by uri {Address}",
@@ -57,7 +74,7 @@
             .WithUrl(NavigationManager.ToAbsoluteUri(hubUri))
             .Build();
 
-        var actionName = nameof(IChatHubClient.ReceiveMessage);
+        const string actionName = nameof(IChatHubClient.ReceiveMessage);
         Logger.LogInformation("Subscribing to action {Action}",
             actionName);
         
@@ -69,25 +86,10 @@
             _messages!.Add(result.Message);
             StateHasChanged();
         });
-        
-        await PullMessagesAsync();
 
         await _hubConnection.StartAsync();
     }
-
-    private async Task PullMessagesAsync()
-    {
-        try
-        {
-            var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
-            _chat = result!.Chat;
-            _messages = _chat.Messages.ToList();
-        }
-        catch (AccessTokenNotAvailableException e)
-        {
-            e.Redirect();
-        }
-    }
+    
     private async Task SendMessage()
     {
         if (_chat is null) return;

@@ -1,9 +1,9 @@
 ﻿namespace WASMChat.Shared.Models.Chats;
 
-public class ChatMessageModel
+public record ChatMessageModel
 {
-    public required int ChatId { get; set; }
-    public required DateTimeOffset SentTime { get; set; }
-    public required ChatUserModel Author { get; set; }
-    public required string Text { get; set; }
+    public required int ChatId { get; init; }
+    public required DateTimeOffset SentTime { get; init; }
+    public required ChatUserModel Author { get; init; }
+    public required string Text { get; init; }
 }
