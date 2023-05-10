@@ -20,6 +20,7 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
 
     public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesAsync(int chatId, int page = 0) => await Set
         .Where(m => m.ChatId == chatId)
+        .OrderByDescending(m => m.DateTimeSent)
         .Skip(page * MessagesPerPage)
         .Take(MessagesPerPage)
         .ToArrayAsync();

@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/wasmchat</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="wasmchat@docker" uuid="3d29d212-e9ed-47c1-b87e-85f0ee13ee3a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:20001/wasmchat</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
