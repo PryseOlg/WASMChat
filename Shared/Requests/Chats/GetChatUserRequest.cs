@@ -1,6 +1,9 @@
-﻿namespace WASMChat.Shared.Requests.Chats;
+﻿using MediatR;
+using WASMChat.Shared.Results.Chats;
 
-public class GetChatUserRequest
+namespace WASMChat.Shared.Requests.Chats;
+
+public record GetChatUserRequest : IRequest<GetChatUserResult>
 {
     public string? AppUserId { get; set; }
 }

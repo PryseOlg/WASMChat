@@ -18,7 +18,7 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
         return chatMessage;
     }
 
-    public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessages(int chatId, int page = 0) => await Set
+    public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesAsync(int chatId, int page = 0) => await Set
         .Where(m => m.ChatId == chatId)
         .Skip(page * MessagesPerPage)
         .Take(MessagesPerPage)

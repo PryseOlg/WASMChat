@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WASMChat.Data.Entities.Abstractions;
 using WASMChat.Data.Entities.Chats;
 
 namespace WASMChat.Data.EntityConfigurations;
@@ -20,6 +21,6 @@ public class ChatUserEntityConfiguration: IEntityTypeConfiguration<ChatUser>
             .WithOne(x => x.Author)
             .HasForeignKey(x => x.AuthorId);
         
-        builder.HasQueryFilter(x => x.IsDeleted == false);
+        builder.SoftDeletable();
     }
 }

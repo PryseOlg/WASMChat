@@ -18,8 +18,15 @@ public class ChatUserService : IService
         _applicationUserRepository = applicationUserRepository;
         _chatUserRepository = chatUserRepository;
     }
+
+    public ValueTask<ChatUser> GetOrRegisterAsync(ClaimsPrincipal principal)
+    {
+        var appUserId = GetAppUserId(principal);
+        return GetOrRegisterAsync(appUserId);
+    }
     
-    public async ValueTask<ChatUser> GetOrRegisterAsync(string appUserId)
+        
+    private async ValueTask<ChatUser> GetOrRegisterAsync(string appUserId)
     {
         var existingUser = await _chatUserRepository
             .GetByAppUserIdAsync(appUserId);
@@ -40,25 +47,11 @@ public class ChatUserService : IService
         return newUser;
     }
 
-    public ValueTask<ChatUser> GetOrRegisterAsync(ClaimsPrincipal principal)
+    public ValueTask<IReadOnlyCollection<ChatUser>> GetAllUsersAsync(int page = 0)
     {
-        var appUserId = GetUserName(principal);
-        return GetOrRegisterAsync(appUserId);
+        return _chatUserRepository.GetAllAsync(page);
     }
 
-    public ValueTask<ChatUser> GetUserAsync(GetChatUserRequest request, HttpContext ctx)
-    {
-        var appUserId = GetUserName(ctx.User);
-        request.AppUserId = appUserId;
-
-        return GetOrRegisterAsync(request.AppUserId);
-    }
-
-    public ValueTask<IReadOnlyCollection<ChatUser>> GetAllUsersAsync(GetAllUsersRequest request, HttpContext _)
-    {
-        return _chatUserRepository.GetAllAsync(request.Page);
-    }
-
-    private static string GetUserName(ClaimsPrincipal principal)
+    private static string GetAppUserId(ClaimsPrincipal principal)
         => principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedException();
 }

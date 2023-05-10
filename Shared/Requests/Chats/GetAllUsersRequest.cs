@@ -1,6 +1,9 @@
-﻿namespace WASMChat.Shared.Requests.Chats;
+﻿using MediatR;
+using WASMChat.Shared.Results.Chats;
 
-public class GetAllUsersRequest
+namespace WASMChat.Shared.Requests.Chats;
+
+public record GetAllUsersRequest : IRequest<GetAllUsersResult>
 {
     public int Page { get; set; } = 0;
 }

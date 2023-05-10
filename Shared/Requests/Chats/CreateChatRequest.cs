@@ -1,6 +1,9 @@
-﻿namespace WASMChat.Shared.Requests.Chats;
+﻿using MediatR;
+using WASMChat.Shared.Results.Chats;
 
-public class CreateChatRequest
+namespace WASMChat.Shared.Requests.Chats;
+
+public record CreateChatRequest : IRequest<CreateChatResult>
 {
     public int OwnerId { get; set; }
     public required string ChatName { get; set; }

@@ -18,16 +18,13 @@ public class ChatMessageService : IService
         _chatUserService = chatUserService;
     }
 
-    public async ValueTask<ChatMessage> SendMessageAsync(PostChatMessageRequest request, HttpContext ctx)
+    public async ValueTask<ChatMessage> SendMessageAsync(string text, int authorId, int chatId)
     {
-        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request.AuthorId = user.Id;
-        
         ChatMessage message = new()
         {
-            MessageText = request.Text,
-            AuthorId = request.AuthorId,
-            ChatId = request.ChatId,
+            MessageText = text,
+            AuthorId = authorId,
+            ChatId = chatId,
         };
 
         await _chatMessageRepository.SaveMessageAsync(message);
@@ -35,6 +32,6 @@ public class ChatMessageService : IService
         return message;
     }
 
-    public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessages(int chatId, int page = 0) =>
-        _chatMessageRepository.GetMessages(chatId, page);
+    public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessagesAsync(int chatId, int page = 0) =>
+        _chatMessageRepository.GetMessagesAsync(chatId, page);
 }

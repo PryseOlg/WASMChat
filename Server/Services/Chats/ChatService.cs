@@ -24,25 +24,20 @@ public class ChatService : IService
         _chatUserRepository = chatUserRepository;
     }
 
-    public async ValueTask<Chat> GetChatAsync(GetChatRequest request, HttpContext ctx)
+    public async ValueTask<Chat> GetChatAsync(int chatId, int chatUserId)
     {
-        var chat = await _chatRepository.GetChatByIdAsync(request.ChatId);
+        var chat = await _chatRepository.GetChatByIdAsync(chatId);
         NotFoundException.ThrowIfNull(chat, "Чат не найден");
         
-        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        
-        return chat.ChatUsers.Contains(user) ? 
+        return chat.ChatUsers.Any(u => u.Id == chatUserId) ? 
             chat : 
             throw new AuthenticationException("У вас нет прав на просмотр этого чата");
     }
 
-    public async ValueTask<Chat> CreateChatAsync(CreateChatRequest request, HttpContext ctx)
+    public async ValueTask<Chat> CreateChatAsync(string chatName, int ownerId, IEnumerable<int> memberIds)
     {
-        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request.OwnerId = user.Id;
-
-        var members = request.MemberIds
-            .Append(request.OwnerId)
+        var members = memberIds
+            .Append(ownerId)
             .Distinct()
             .Select(async id => await _chatUserRepository.GetByIdAsync(id))
             .Select(task => task.Result)
@@ -51,8 +46,8 @@ public class ChatService : IService
         
         var chat = new Chat
         {
-            Name = request.ChatName,
-            OwnerId = request.OwnerId,
+            Name = chatName,
+            OwnerId = ownerId,
             ChatUsers = members
         };
 
@@ -61,11 +56,6 @@ public class ChatService : IService
         return chat;
     }
 
-    public async ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(GetAllChatsRequest request, HttpContext ctx)
-    {
-        var user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request.UserId = user.Id;
-
-        return await _chatRepository.GetAllChats(request.UserId, request.Page);
-    }
+    public ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(int userId, int page = 0)
+        => _chatRepository.GetAllChats(userId, page);
 }

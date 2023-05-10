@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MediatR;
+using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Shared.Requests.Chats;
 
-public class PostChatMessageRequest
+public record PostChatMessageRequest : IRequest<PostChatMessageResult>
 {
     public int AuthorId { get; set; }
     public int ChatId { get; set; }

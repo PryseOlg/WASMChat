@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using WASMChat.Data.Entities.Abstractions;
 using WASMChat.Data.Entities.Chats;
 
 namespace WASMChat.Data.EntityConfigurations;
@@ -18,6 +19,6 @@ public class ChatMessageEntityConfiguration: IEntityTypeConfiguration<ChatMessag
         builder.Property(x => x.DateTimeSent)
             .ValueGeneratedOnAdd();
         
-        builder.HasQueryFilter(x => x.IsDeleted == false);
+        builder.SoftDeletable();
     }
 }

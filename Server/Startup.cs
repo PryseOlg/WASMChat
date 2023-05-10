@@ -60,6 +60,11 @@ public class Startup
         services.AddValidators();
         services.AddMappers();
 
+        services.AddMediatR(mediatr =>
+        {
+            mediatr.RegisterServicesFromAssemblyContaining<Startup>();
+        });
+
         services.AddSwaggerGen(ConfigureSwaggerGen); // Добавляет сервисы для сваггера
     }
 
@@ -110,7 +115,7 @@ public class Startup
     {
         options.SwaggerDoc("v1", new OpenApiInfo
         {
-            Title = "WASM Chat API",
+            Title = "WASMChat API",
             Version = "v1"
         });
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

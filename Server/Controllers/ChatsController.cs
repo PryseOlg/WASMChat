@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WASMChat.Server.Mappers.Chats;
-using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
 
@@ -12,111 +11,41 @@ namespace WASMChat.Server.Controllers;
 [Route("api/[controller]")]
 public class ChatsController : ControllerBase
 {
-    private readonly ChatMessageService _chatMessageService;
-    private readonly ChatMessageModelMapper _chatMessageModelMapper;
-    
-    private readonly ChatService _chatService;
-    private readonly ChatModelMapper _chatModelMapper;
-
-    private readonly ChatUserService _chatUserService;
-    private readonly ChatUserModelMapper _chatUserModelMapper;
-
-    public ChatsController(
-        ChatMessageService chatMessageService, 
-        ChatMessageModelMapper chatMessageModelMapper, 
-        ChatService chatService, 
-        ChatModelMapper chatModelMapper,
-        ChatUserService chatUserService, 
-        ChatUserModelMapper chatUserModelMapper)
+    private readonly IMediator _mediator;
+    public ChatsController(IMediator mediator)
     {
-        _chatMessageService = chatMessageService;
-        _chatMessageModelMapper = chatMessageModelMapper;
-        _chatService = chatService;
-        _chatModelMapper = chatModelMapper;
-        _chatUserService = chatUserService;
-        _chatUserModelMapper = chatUserModelMapper;
+        _mediator = mediator;
     }
-    
+
     [HttpGet("users/current")]
-    public async Task<IActionResult> GetChatUser(
+    public Task<GetChatUserResult> GetChatUser(
         [FromQuery] GetChatUserRequest request)
-    {
-        var user = await _chatUserService.GetUserAsync(request, HttpContext);
+        => _mediator.Send(request);
 
-        var result = new GetChatUserResult
-        {
-            User = _chatUserModelMapper.Create(user)
-        };
-        return Ok(result);
-    }
-    
     [HttpGet]
-    public async Task<IActionResult> GetChats(
+    public Task<GetAllChatsResult> GetChats(
         [FromQuery] GetAllChatsRequest request)
-    {
-        var chats = await _chatService.GetAllChatsAsync(request, HttpContext);
-
-        var result = new GetAllChatsResult
-        {
-            Chats = chats.Select(_chatModelMapper.Create).ToArray()
-        };
-        return Ok(result);
-    }
+        => _mediator.Send(request);
 
     [HttpGet("{chatId:int}")]
-    public async Task<IActionResult> GetChat(
+    public Task<GetChatResult> GetChat(
         [FromRoute] int chatId,
         [FromQuery] GetChatRequest request)
-    {
-        request.ChatId = chatId;
-        var chat = await _chatService.GetChatAsync(request, HttpContext);
-
-        var result = new GetChatResult
-        {
-            Chat = _chatModelMapper.Create(chat)
-        };
-        return Ok(result);
-    }
-    
+        => _mediator.Send(request with { ChatId = chatId });
     
     [HttpPost]
-    public async Task<IActionResult> CreateChat(
+    public Task<CreateChatResult> CreateChat(
         [FromBody] CreateChatRequest request)
-    {
-        var chat = await _chatService.CreateChatAsync(request, HttpContext);
-
-        var result = new CreateChatResult()
-        {
-            Chat = _chatModelMapper.Create(chat)
-        };
-        return Ok(result);
-    }
+        => _mediator.Send(request);
 
     [HttpPost("{chatId:int}/messages")]
-    public async Task<IActionResult> PostMessage(
+    public Task<PostChatMessageResult> PostMessage(
         [FromRoute] int chatId,
         [FromBody] PostChatMessageRequest request)
-    {
-        request.ChatId = chatId;
-        var message = await _chatMessageService.SendMessageAsync(request, HttpContext);
-        
-        var result = new PostChatMessageResult()
-        {
-            Message = _chatMessageModelMapper.Create(message)
-        };
-        return Ok(result);
-    }
-    
-    [HttpGet("users")]
-    public async Task<IActionResult> GetAllUsers(
-        [FromQuery] GetAllUsersRequest request)
-    {
-        var users = await _chatUserService.GetAllUsersAsync(request, HttpContext);
+        => _mediator.Send(request with { ChatId = chatId });
 
-        var result = new GetAllUsersResult()
-        {
-            Users = users.Select(_chatUserModelMapper.Create).ToArray()
-        };
-        return Ok(result);
-    }
+    [HttpGet("users")]
+    public Task<GetAllUsersResult> GetAllUsers(
+        [FromQuery] GetAllUsersRequest request)
+        => _mediator.Send(request);
 }
