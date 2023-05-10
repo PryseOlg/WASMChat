@@ -32,6 +32,9 @@ public class ChatMessageService : IService
         return message;
     }
 
-    public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessagesAsync(int chatId, int page = 0) =>
-        _chatMessageRepository.GetMessagesAsync(chatId, page);
+    public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessagesAsync(int chatId, int page = 0) 
+        => _chatMessageRepository.GetMessagesAsync(chatId, page);
+
+    public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessagesBeforeAsync(int chatId, DateTimeOffset radix)
+        => _chatMessageRepository.GetMessagesBefore(chatId, radix);
 }

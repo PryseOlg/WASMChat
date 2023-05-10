@@ -24,5 +24,11 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
         .Skip(page * MessagesPerPage)
         .Take(MessagesPerPage)
         .ToArrayAsync();
-
+    
+    public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesBefore(int chatId, DateTimeOffset radix) => await Set
+        .Where(m => m.ChatId == chatId)
+        .Where(m => m.DateTimeSent < radix)
+        .OrderByDescending(m => m.DateTimeSent)
+        .Take(MessagesPerPage)
+        .ToArrayAsync();
 }

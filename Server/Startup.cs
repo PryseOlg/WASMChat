@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Net.Mime;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -66,7 +67,7 @@ public class Startup
         services.AddResponseCompression(opts =>
         {
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                new[] { "application/octet-stream" });
+                new[] { MediaTypeNames.Application.Octet });
         });
 
         services.AddMediatR(mediatr =>
@@ -89,7 +90,7 @@ public class Startup
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WASNChat Apiv1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "WasmChat Api v1");
             });
         }
         else
