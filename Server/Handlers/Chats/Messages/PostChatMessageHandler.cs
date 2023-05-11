@@ -1,43 +1,42 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using WASMChat.Data.Entities.Chats;
-using WASMChat.Server.Extensions;
 using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers.Chats;
 using WASMChat.Server.Services.Chats;
-using WASMChat.Shared.HubClients;
-using WASMChat.Shared.Requests.Chats;
-using WASMChat.Shared.Results.Chats;
+using WASMChat.Shared.HubContracts.Chats;
+using WASMChat.Shared.Requests.Chats.Messages;
+using WASMChat.Shared.Results.Chats.Messages;
 
-namespace WASMChat.Server.Handlers;
+namespace WASMChat.Server.Handlers.Chats.Messages;
 
 public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, PostChatMessageResult>
 {
     private readonly ChatMessageService _chatMessageService;
     private readonly ChatMessageModelMapper _chatMessageModelMapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ChatUserService _chatUserService;
-    private readonly IHubContext<ChatHub, IChatHubClient> _hubContext;
+    private readonly IHubContext<ChatHub> _hubContext;
+    private readonly ILogger<PostChatMessageHandler> _logger;
 
     public PostChatMessageHandler(
         ChatMessageService chatMessageService, 
-        ChatMessageModelMapper chatMessageModelMapper, 
-        IHttpContextAccessor httpContextAccessor, 
+        ChatMessageModelMapper chatMessageModelMapper,
         ChatUserService chatUserService, 
-        IHubContext<ChatHub, IChatHubClient> hubContext)
+        IHubContext<ChatHub> hubContext,
+        ILogger<PostChatMessageHandler> logger)
     {
         _chatMessageService = chatMessageService;
         _chatMessageModelMapper = chatMessageModelMapper;
-        _httpContextAccessor = httpContextAccessor;
         _chatUserService = chatUserService;
         _hubContext = hubContext;
+        _logger = logger;
     }
 
     public async Task<PostChatMessageResult> Handle(PostChatMessageRequest request, CancellationToken cancellationToken)
     {
-        HttpContext ctx = _httpContextAccessor.GetContext();
+        ArgumentNullException.ThrowIfNull(request.User, nameof(request.User));
         
-        ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User);
         request = request with { AuthorId = user.Id };
 
         ChatMessage message = await _chatMessageService.SendMessageAsync(
@@ -50,9 +49,21 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
             Message = _chatMessageModelMapper.Create(message)
         };
 
+        var groupName = $"Chat_{request.ChatId}";
+        
+        _logger.LogInformation("Sending message {Message} to group {Group}",
+            result, groupName);
+
         await _hubContext.Clients
-            .Group($"Chat_{request.ChatId}")
-            .ReceiveMessage(result);
+            .Group(groupName)
+            .SendCoreAsync(
+                nameof(IChatHubClient.MessagePosted), 
+                new object?[] { result }, 
+                cancellationToken);
+        
+        _logger.LogInformation("Sent message {Message} to group {Group}",
+            result, groupName);
+        
         return result;
     }
 }

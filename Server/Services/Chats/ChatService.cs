@@ -11,16 +11,13 @@ namespace WASMChat.Server.Services.Chats;
 public class ChatService : IService
 {
     private readonly ChatRepository _chatRepository;
-    private readonly ChatUserService _chatUserService;
     private readonly ChatUserRepository _chatUserRepository;
 
     public ChatService(
         ChatRepository chatRepository, 
-        ChatUserService chatUserService, 
         ChatUserRepository chatUserRepository)
     {
         _chatRepository = chatRepository;
-        _chatUserService = chatUserService;
         _chatUserRepository = chatUserRepository;
     }
 
@@ -56,6 +53,9 @@ public class ChatService : IService
         return chat;
     }
 
-    public ValueTask<IReadOnlyCollection<Chat>> GetAllChatsAsync(int userId, int page = 0)
-        => _chatRepository.GetAllChats(userId, page);
+    public ValueTask<IReadOnlyCollection<Chat>> GetChatsAsync(int userId, int page = 0)
+        => _chatRepository.GetChats(userId, page);
+
+    public ValueTask<IReadOnlyCollection<int>> GetAllChatIds(int userId)
+        => _chatRepository.GetAllChatIds(userId);
 }

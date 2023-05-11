@@ -6,41 +6,42 @@ using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
 
-namespace WASMChat.Server.Handlers;
+namespace WASMChat.Server.Handlers.Chats;
 
-public class CreateChatHandler : IRequestHandler<CreateChatRequest, CreateChatResult>
+public class GetChatHandler : IRequestHandler<GetChatRequest, GetChatResult>
 {
     private readonly ChatService _chatService;
     private readonly ChatModelMapper _chatModelMapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ChatUserService _chatUserService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly ChatUserModelMapper _chatUserModelMapper;
 
-    public CreateChatHandler(
+    public GetChatHandler(
         ChatService chatService, 
         ChatModelMapper chatModelMapper, 
+        ChatUserService chatUserService, 
         IHttpContextAccessor httpContextAccessor, 
-        ChatUserService chatUserService)
+        ChatUserModelMapper chatUserModelMapper)
     {
         _chatService = chatService;
         _chatModelMapper = chatModelMapper;
-        _httpContextAccessor = httpContextAccessor;
         _chatUserService = chatUserService;
+        _httpContextAccessor = httpContextAccessor;
+        _chatUserModelMapper = chatUserModelMapper;
     }
 
-    public async Task<CreateChatResult> Handle(CreateChatRequest request, CancellationToken cancellationToken)
+    public async Task<GetChatResult> Handle(GetChatRequest request, CancellationToken cancellationToken)
     {
         HttpContext ctx = _httpContextAccessor.GetContext();
-        
+
         ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request = request with { OwnerId = user.Id };
+        request = request with { UserId = user.Id };
         
-        Chat chat = await _chatService.CreateChatAsync(
-            request.ChatName, 
-            request.OwnerId, 
-            request.MemberIds);
+        Chat chat = await _chatService.GetChatAsync(request.ChatId, request.UserId);
         
-        var result = new CreateChatResult
+        var result = new GetChatResult
         {
+            CurrentUser = _chatUserModelMapper.Create(user),
             Chat = _chatModelMapper.Create(chat)
         };
         return result;

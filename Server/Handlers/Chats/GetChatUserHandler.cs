@@ -6,7 +6,7 @@ using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
 
-namespace WASMChat.Server.Handlers;
+namespace WASMChat.Server.Handlers.Chats;
 
 public class GetChatUserHandler : IRequestHandler<GetChatUserRequest, GetChatUserResult>
 {

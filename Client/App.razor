@@ -1,5 +1,7 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
+﻿@using System.Reflection
+@using WASMChat.Pages.Chat.Pages
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="@PageAssemblies">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
@@ -23,3 +25,11 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code
+{
+    private readonly Assembly[] PageAssemblies = 
+    {
+        typeof(ChatPage).Assembly
+    };
+}

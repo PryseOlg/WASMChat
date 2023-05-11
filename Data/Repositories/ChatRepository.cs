@@ -23,10 +23,18 @@ public class ChatRepository : RepositoryBase<Chat>
         return chat;
     }
 
-    public async ValueTask<IReadOnlyCollection<Chat>> GetAllChats(int userId, int page = 0) => await Set
+    public async ValueTask<IReadOnlyCollection<Chat>> GetChats(int userId, int page = 0) => await Set
         .Where(c => c.ChatUsers.Any(u => u.Id == userId))
+        .Include(c => c.Messages.OrderBy(m => m.DateTimeSent).Take(1))
+        .ThenInclude(m => m.Author)
+        .OrderBy(c => c.Id)
         .Skip(ChatsPerPage * page)
         .Take(ChatsPerPage)
+        .ToArrayAsync();
+
+    public async ValueTask<IReadOnlyCollection<int>> GetAllChatIds(int userId) => await Set
+        .Where(c => c.ChatUsers.Any(u => u.Id == userId))
+        .Select(c => c.Id)
         .ToArrayAsync();
 
 }

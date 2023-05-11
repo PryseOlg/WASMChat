@@ -1,6 +1,6 @@
 ﻿using WASMChat.Shared.Models.Chats;
 
-namespace WASMChat.Shared.Results.Chats;
+namespace WASMChat.Shared.Results.Chats.Messages;
 
 public record PostChatMessageResult
 {

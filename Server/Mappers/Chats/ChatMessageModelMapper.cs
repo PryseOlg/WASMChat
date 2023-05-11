@@ -16,6 +16,7 @@ public class ChatMessageModelMapper : IMapper
     {
         return new ChatMessageModel
         {
+            Id = message.Id,
             ChatId = message.ChatId,
             SentTime = message.DateTimeSent,
             Text = message.MessageText,

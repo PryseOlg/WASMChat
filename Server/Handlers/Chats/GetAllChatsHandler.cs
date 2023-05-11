@@ -6,43 +6,39 @@ using WASMChat.Server.Services.Chats;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Results.Chats;
 
-namespace WASMChat.Server.Handlers;
+namespace WASMChat.Server.Handlers.Chats;
 
-public class GetChatHandler : IRequestHandler<GetChatRequest, GetChatResult>
+public class GetAllChatsHandler : IRequestHandler<GetAllChatsRequest, GetAllChatsResult>
 {
     private readonly ChatService _chatService;
     private readonly ChatModelMapper _chatModelMapper;
     private readonly ChatUserService _chatUserService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ChatUserModelMapper _chatUserModelMapper;
 
-    public GetChatHandler(
+    public GetAllChatsHandler(
         ChatService chatService, 
         ChatModelMapper chatModelMapper, 
         ChatUserService chatUserService, 
-        IHttpContextAccessor httpContextAccessor, 
-        ChatUserModelMapper chatUserModelMapper)
+        IHttpContextAccessor httpContextAccessor)
     {
         _chatService = chatService;
         _chatModelMapper = chatModelMapper;
         _chatUserService = chatUserService;
         _httpContextAccessor = httpContextAccessor;
-        _chatUserModelMapper = chatUserModelMapper;
     }
 
-    public async Task<GetChatResult> Handle(GetChatRequest request, CancellationToken cancellationToken)
+    public async Task<GetAllChatsResult> Handle(GetAllChatsRequest request, CancellationToken cancellationToken)
     {
         HttpContext ctx = _httpContextAccessor.GetContext();
-
+        
         ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         request = request with { UserId = user.Id };
         
-        Chat chat = await _chatService.GetChatAsync(request.ChatId, request.UserId);
+        var chats = await _chatService.GetChatsAsync(request.UserId, request.Page);
         
-        var result = new GetChatResult
+        var result = new GetAllChatsResult
         {
-            CurrentUser = _chatUserModelMapper.Create(user),
-            Chat = _chatModelMapper.Create(chat)
+            Chats = chats.Select(_chatModelMapper.Create).ToArray()
         };
         return result;
     }

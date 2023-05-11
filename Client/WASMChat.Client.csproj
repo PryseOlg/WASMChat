@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Pages\Chat\WASMChat.Pages.Chat.csproj" />
     <ProjectReference Include="..\Shared\WASMChat.Shared.csproj" />
   </ItemGroup>
 

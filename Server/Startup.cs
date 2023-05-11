@@ -1,9 +1,11 @@
 ﻿using System.Net.Mime;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WASMChat.Data.Entities;
@@ -11,6 +13,7 @@ using WASMChat.Data;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers;
+using WASMChat.Server.Options;
 using WASMChat.Server.Services;
 using WASMChat.Server.Validators;
 
@@ -50,6 +53,7 @@ public class Startup
         services.AddAuthentication()
             .AddCustomOAuth(_config.GetSection("Authentication"))
             .AddIdentityServerJwt();
+        services.AddSingleton<IPostConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
 
         services.AddControllersWithViews()
             .AddJsonOptions(options =>
@@ -113,7 +117,7 @@ public class Startup
 
         app.UseEndpoints(e =>
         {
-            e.MapHub<ChatHub>("api/Chats/{chatId:int}/hub");
+            e.MapHub<ChatHub>("api/hubs/chats");
             e.MapRazorPages();
             e.MapControllers();
             e.MapFallbackToFile("index.html");
