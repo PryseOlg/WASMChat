@@ -10,8 +10,9 @@ public record PostChatMessageRequest : IRequest<PostChatMessageResult>
     public const int MaxTextLength = 2000;
     
     public int AuthorId { get; init; }
-    public int ChatId { get; init; }
+    public int? ReferencedMessageId { get; init; }
     public ClaimsPrincipal? User { get; init; }
+    public required int ChatId { get; init; }
     [MinLength(1), MaxLength(MaxTextLength)]
     public required string Text { get; init; }
 }

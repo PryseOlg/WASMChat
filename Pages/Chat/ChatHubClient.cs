@@ -25,9 +25,9 @@ public class ChatHubClient : HubClientBase
     
     protected override string HubRelativeUrl => "/api/hubs/chats";
 
-    public event Action<PostChatMessageResult> OnMessagePosted;
-    public event Action<DeleteChatMessageResult> OnMessageDeleted;
-    public event Action<EditChatMessageResult> OnMessageEdited;
+    public event Action<PostChatMessageResult>? OnMessagePosted;
+    public event Action<DeleteChatMessageResult>? OnMessageDeleted;
+    public event Action<EditChatMessageResult>? OnMessageEdited;
 
     public async Task PostMessage(PostChatMessageRequest request)
     {
@@ -47,15 +47,15 @@ public class ChatHubClient : HubClientBase
     {
         Connection.On<PostChatMessageResult>(
             nameof(IChatHubClient.MessagePosted), 
-            r => OnMessagePosted(r));
+            r => OnMessagePosted?.Invoke(r));
         OnMessagePosted += Log;
         Connection.On<DeleteChatMessageResult>(
             nameof(IChatHubClient.MessageDeleted),
-            r => OnMessageDeleted(r));
+            r => OnMessageDeleted?.Invoke(r));
         OnMessagePosted += Log;
         Connection.On<EditChatMessageResult>(
             nameof(IChatHubClient.MessageEdited), 
-            r => OnMessageEdited(r));
+            r => OnMessageEdited?.Invoke(r));
         OnMessagePosted += Log;
     }
 

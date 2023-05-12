@@ -18,6 +18,7 @@ public class ChatMessageModelMapper : IMapper
         {
             Id = message.Id,
             ChatId = message.ChatId,
+            ReferencedMessageId = message.ReferencedMessageId,
             SentTime = message.DateTimeSent,
             Text = message.MessageText,
             Author = _userModelMapper.Create(message.Author!)
