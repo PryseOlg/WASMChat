@@ -14,6 +14,7 @@ using WASMChat.Data.Repositories;
 using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers;
 using WASMChat.Server.Options;
+using WASMChat.Server.Pipelines;
 using WASMChat.Server.Services;
 using WASMChat.Server.Validators;
 
@@ -68,16 +69,18 @@ public class Startup
         services.AddMappers();
         
         services.AddSignalR();
+
         services.AddResponseCompression(opts =>
         {
-            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                new[] { MediaTypeNames.Application.Octet });
+            opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Append(MediaTypeNames.Application.Octet);
         });
 
         services.AddMediatR(mediatr =>
         {
             mediatr.RegisterServicesFromAssemblyContaining<Startup>();
         });
+        
+        services.AddScoped(typeof(LoggingPipelineBehaviour<,>));
 
         services.AddSwaggerGen(ConfigureSwaggerGen); // Добавляет сервисы для сваггера
     }

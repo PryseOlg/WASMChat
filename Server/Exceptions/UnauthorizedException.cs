@@ -12,9 +12,11 @@ public class UnauthorizedException : Exception
     
     public static void ThrowIfNull([NotNull] object? param, string? message = null)
     {
-        if (param is null)
-        {
-            throw new UnauthorizedException(message);
-        }
+        if (param is null) throw new UnauthorizedException(message);
+    }
+
+    public static void ThrowIf(bool check, string? message = null)
+    {
+        if (check) throw new UnauthorizedException(message);
     }
 }

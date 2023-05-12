@@ -39,7 +39,10 @@ public class ChatHub : Hub<IChatHubClient>, IChatHub
 
     public Task DeleteMessage(DeleteChatMessageRequest request)
     {
-        throw new NotImplementedException();
+        request = request with { User = Context.User };
+        _logger.LogInformation("Processing request {Request}",
+            request);
+        return _mediator.Send(request);
     }
 
     public Task EditMessage(EditChatMessageRequest request)

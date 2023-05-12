@@ -5,7 +5,6 @@
 @using WASMChat.Shared.Results.Chats
 @using System.Net.Http.Json
 @using Microsoft.Extensions.Logging
-@using WASMChat.Shared.HubContracts.Chats
 @using WASMChat.Shared.Requests.Chats.Messages
 @using WASMChat.Shared.Results.Chats.Messages
 @inject HttpClient Http
@@ -20,13 +19,10 @@
     <div class="chat-messages-container">
         @if (_chat is not null)
         {
-            @foreach (var msg in _messages!
-                .DistinctBy(m => m.Id)
+            @foreach (var msg in _messages.Values
                 .OrderBy(m => m.SentTime))
             {
-                <div class='@(msg.Author.Id == _currentUser!.Id ? "message-author" : "message-other")'>
-                    <ChatMessageComponent Message="@msg"/>
-                </div>
+                <ChatMessageComponent Message="@msg" IsAuthor="@(msg.Author.Id == _currentUser!.Id)"/>
             }
         }
     </div>
@@ -42,7 +38,7 @@
     public int ChatId { get; set; }
     private ChatUserModel? _currentUser;
     private ChatModel? _chat;
-    private List<ChatMessageModel> _messages = new();
+    private Dictionary<int, ChatMessageModel> _messages = new();
 
     private string _typedMessage = string.Empty;
 
@@ -50,6 +46,7 @@
     {
         Logger.LogInformation("Subscribing to hub");
         HubClient.OnMessagePosted += AddMessage;
+        HubClient.OnMessageDeleted += DeleteMessage;
             
         await HubClient.StartAsync();
         await PullMessagesAsync();
@@ -61,7 +58,7 @@
         {
             var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
             _chat = result!.Chat;
-            _messages = _chat.Messages.ToList();
+            _messages = _chat.Messages.ToDictionary(m => m.Id, m => m);
             _currentUser = result.CurrentUser;
         }
         catch (AccessTokenNotAvailableException e)
@@ -97,7 +94,14 @@
     private void AddMessage(PostChatMessageResult result)
     {
         Logger.LogInformation("Received event {Result}", result);
-        _messages.Add(result.Message);
+        _messages.Add(result.Message.Id, result.Message);
+        StateHasChanged();
+    }
+
+    private void DeleteMessage(DeleteChatMessageResult result)
+    {
+        Logger.LogInformation("Deleting message with ID {Id}", result.MessageId);
+        _messages.Remove(result.MessageId);
         StateHasChanged();
     }
 }

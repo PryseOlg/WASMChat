@@ -25,10 +25,18 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
         .Take(MessagesPerPage)
         .ToArrayAsync();
     
-    public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesBefore(int chatId, DateTimeOffset radix) => await Set
+    public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesBeforeAsync(int chatId, DateTimeOffset radix) => await Set
         .Where(m => m.ChatId == chatId)
         .Where(m => m.DateTimeSent < radix)
         .OrderByDescending(m => m.DateTimeSent)
         .Take(MessagesPerPage)
         .ToArrayAsync();
+
+    public ValueTask<ChatMessage?> GetMessageAsync(int messageId) => Set.FindAsync(messageId);
+
+    public async ValueTask DeleteMessageAsync(ChatMessage message)
+    {
+        Set.Remove(message);
+        await CommitAsync();
+    }
 }

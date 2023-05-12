@@ -1,13 +1,39 @@
 ﻿@using WASMChat.Shared.Models.Chats
 @using System.Diagnostics.CodeAnalysis
+@using Microsoft.JSInterop
+@using WASMChat.CommonComponents.JsInterop
+@using WASMChat.Shared.Requests.Chats.Messages
+@inject ChatHubClient HubClient
+@inject IJSRuntime JsRuntime
 
-<p>
-    @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.ToLocalTime()<br/>
-    @Message.Text
-</p>
+<div class="@(IsAuthor ? "message-author" : "message-other")">
+    <p>
+        @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.LocalDateTime
+        @if (IsAuthor)
+        {
+            <button @onclick="@DeleteMessage">X</button>
+        }
+        <br/>
+        @Message.Text
+    </p>
+</div>
 
 @code {
     [Parameter, NotNull]
     public ChatMessageModel? Message { get; set; }
-    
+    [Parameter]
+    public bool IsAuthor { get; set; }
+
+    private async Task DeleteMessage()
+    {
+        var request = new DeleteChatMessageRequest()
+        {
+            ChatId = Message.ChatId,
+            MessageId = Message.Id,
+        };
+        if (await JsRuntime.ConfirmAsync("Вы уверены что хотите удалить сообщение?") is false) 
+            return;
+        
+        await HubClient.DeleteMessage(request);
+    }
 }

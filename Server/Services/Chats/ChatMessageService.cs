@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Data.Repositories;
+using WASMChat.Server.Exceptions;
 using WASMChat.Shared.Requests.Chats;
 
 namespace WASMChat.Server.Services.Chats;
@@ -36,5 +37,15 @@ public class ChatMessageService : IService
         => _chatMessageRepository.GetMessagesAsync(chatId, page);
 
     public ValueTask<IReadOnlyCollection<ChatMessage>> FetchMessagesBeforeAsync(int chatId, DateTimeOffset radix)
-        => _chatMessageRepository.GetMessagesBefore(chatId, radix);
+        => _chatMessageRepository.GetMessagesBeforeAsync(chatId, radix);
+
+    public async ValueTask DeleteMessageAsync(int messageId, int authorId)
+    {
+        var message = await _chatMessageRepository.GetMessageAsync(messageId);
+        
+        ArgumentNullException.ThrowIfNull(message, nameof(message));
+        UnauthorizedException.ThrowIf(message.AuthorId != authorId, "У вас нет прав удалять это сообщение");
+
+        await _chatMessageRepository.DeleteMessageAsync(message);
+    }
 }

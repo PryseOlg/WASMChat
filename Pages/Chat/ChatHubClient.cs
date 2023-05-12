@@ -36,19 +36,26 @@ public class ChatHubClient : HubClientBase
         _logger.LogInformation("Sent message {Request}", request);
     }
 
+    public async Task DeleteMessage(DeleteChatMessageRequest request)
+    {
+        _logger.LogInformation("Sending message {Request}", request);
+        await Connection.InvokeCoreAsync(nameof(IChatHub.DeleteMessage), new object?[] { request });
+        _logger.LogInformation("Sent message {Request}", request);
+    }
+
     private void SubscribeEvents()
     {
         Connection.On<PostChatMessageResult>(
             nameof(IChatHubClient.MessagePosted), 
-            OnMessagePosted.Invoke);
+            r => OnMessagePosted(r));
         OnMessagePosted += Log;
         Connection.On<DeleteChatMessageResult>(
             nameof(IChatHubClient.MessageDeleted),
-            OnMessageDeleted.Invoke);
+            r => OnMessageDeleted(r));
         OnMessagePosted += Log;
         Connection.On<EditChatMessageResult>(
             nameof(IChatHubClient.MessageEdited), 
-            OnMessageEdited.Invoke);
+            r => OnMessageEdited(r));
         OnMessagePosted += Log;
     }
 
