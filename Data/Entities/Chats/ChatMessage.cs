@@ -11,6 +11,9 @@ public class ChatMessage : ISoftDeletable
     [MaxLength(2000)]
     public required string MessageText { get; set; }
     
+    public int? ReferencedMessageId { get; set; }
+    public ChatMessage? ReferencedMessage { get; set; }
+    
     public ChatUser? Author { get; set; }
     public int AuthorId { get; set; }
     

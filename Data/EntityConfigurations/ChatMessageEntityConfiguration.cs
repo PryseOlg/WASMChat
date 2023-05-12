@@ -12,6 +12,11 @@ public class ChatMessageEntityConfiguration: IEntityTypeConfiguration<ChatMessag
         builder.ToTable("ChatMessages");
         
         builder.HasKey(x => x.Id);
+
+        builder.HasOne(x => x.ReferencedMessage)
+            .WithMany()
+            .IsRequired(false)
+            .HasForeignKey(m => m.ReferencedMessageId);
         
         builder.HasOne(x => x.Author)
             .WithMany(x => x.Messages);
