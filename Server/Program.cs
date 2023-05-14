@@ -1,4 +1,5 @@
 using Serilog;
+using WASMChat.Server.Mappers.Chats;
 
 Host.CreateDefaultBuilder()
     .UseSerilog((ctx, logger) =>

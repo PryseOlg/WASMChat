@@ -1,8 +1,10 @@
-﻿using WASMChat.Data.Entities.Chats;
+﻿using WASMChat.CodeGenerators.Attributes;
+using WASMChat.Data.Entities.Chats;
 using WASMChat.Shared.Models.Chats;
 
 namespace WASMChat.Server.Mappers.Chats;
 
+[InjectScoped]
 public class ChatModelMapper : IMapper
 {
     private readonly ChatUserModelMapper _userModelMapper;

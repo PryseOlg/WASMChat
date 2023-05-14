@@ -27,6 +27,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Client\WASMChat.Client.csproj" />
+    <ProjectReference Include="..\CodeGenerators\WASMChat.CodeGenerators.csproj" 
+      OutputItemType="Analyser" ReferenceOutputAssembly="true"/>
     <ProjectReference Include="..\Data\WASMChat.Data.csproj" />
     <ProjectReference Include="..\Shared\WASMChat.Shared.csproj" />
   </ItemGroup>

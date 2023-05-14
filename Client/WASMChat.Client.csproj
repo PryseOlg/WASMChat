@@ -18,6 +18,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Pages\Chat\WASMChat.Pages.Chat.csproj" />
     <ProjectReference Include="..\Shared\WASMChat.Shared.csproj" />
+    <ProjectReference 
+            Include="..\CodeGenerators\WASMChat.CodeGenerators.csproj" 
+            OutputItemType="Analyser" 
+            ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>

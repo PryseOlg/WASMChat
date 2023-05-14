@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WASMChat.Pages.Chat", "Page
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pages", "Pages", "{4E84C00A-CBF8-4BF5-9E46-B5B239D578D7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WASMChat.CodeGenerators", "CodeGenerators\WASMChat.CodeGenerators.csproj", "{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,18 @@ Global
 		{2331571C-826C-4A6C-936A-1D6078DEE833}.Release|x64.Build.0 = Release|Any CPU
 		{2331571C-826C-4A6C-936A-1D6078DEE833}.Release|x86.ActiveCfg = Release|Any CPU
 		{2331571C-826C-4A6C-936A-1D6078DEE833}.Release|x86.Build.0 = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|x64.Build.0 = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5BF6569-B1EA-47A3-B3D2-73F70056D0D3}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
