@@ -47,15 +47,15 @@ public class ChatHubClient : HubClientBase
     {
         Connection.On<PostChatMessageResult>(
             nameof(IChatHubClient.MessagePosted), 
-            OnMessagePosted.Invoke);
+            r => OnMessagePosted.Invoke(r));
         OnMessagePosted += Log;
         Connection.On<DeleteChatMessageResult>(
             nameof(IChatHubClient.MessageDeleted),
-            OnMessageDeleted.Invoke);
+            r => OnMessageDeleted.Invoke(r));
         OnMessagePosted += Log;
         Connection.On<EditChatMessageResult>(
             nameof(IChatHubClient.MessageEdited), 
-            OnMessageEdited.Invoke);
+            r => OnMessageEdited.Invoke(r));
         OnMessagePosted += Log;
     }
 

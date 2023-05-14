@@ -13,6 +13,7 @@ using WASMChat.Data;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Hubs;
 using WASMChat.Server.Mappers;
+using WASMChat.Server.Middlewares;
 using WASMChat.Server.Options;
 using WASMChat.Server.Pipelines;
 using WASMChat.Server.Services;
@@ -33,8 +34,10 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        services.AddErrorHandling();
+
         var connectionString = _config.GetConnectionString("DefaultConnection") 
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+                               ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
@@ -42,7 +45,8 @@ public class Startup
         
         services.AddDatabaseDeveloperPageExceptionFilter();
 
-        services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        services.AddDefaultIdentity<ApplicationUser>(options => 
+                options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<ApplicationDbContext>();
 
         services.AddIdentityServer()
@@ -57,10 +61,8 @@ public class Startup
         services.AddSingleton<IPostConfigureOptions<JwtBearerOptions>, ConfigureJwtBearerOptions>();
 
         services.AddControllersWithViews()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
-            });
+            .AddJsonOptions(options => 
+                options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping);
         
         services.AddRazorPages();
 
@@ -82,6 +84,8 @@ public class Startup
         
         services.AddScoped(typeof(LoggingPipelineBehaviour<,>));
 
+        services.AddNgrok();
+
         services.AddSwaggerGen(ConfigureSwaggerGen); // Добавляет сервисы для сваггера
     }
 
@@ -89,6 +93,13 @@ public class Startup
     {
         app.UseResponseCompression();
         
+        if (_config.NgrokEnabled())
+        {
+            app.UseNgrok();
+        }
+        
+        app.UseErrorHandling();
+
         if (_env.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
