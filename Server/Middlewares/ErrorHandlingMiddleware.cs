@@ -14,7 +14,7 @@ public class ErrorHandlingMiddleware : IMiddleware
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
         }
-        catch (ArgumentNullException)
+        catch (ArgumentException)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
