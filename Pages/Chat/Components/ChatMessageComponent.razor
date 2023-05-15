@@ -9,7 +9,7 @@
         <ChatUserComponent User="@Message.Author"/> at @Message.SentTime.LocalDateTime
         @if (IsAuthor)
         {
-            <button @onclick="@DeleteMessage">X</button>
+            <button class="button" @onclick="@DeleteMessage">x</button>
         }
         <br/>
         @Message.Text

@@ -1,0 +1,50 @@
+﻿/* Стили для компонента чата */
+.chat-user {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    background: #aae8f5;
+    padding: 10px;
+    border-radius: 20px;
+    max-height: 800px;
+    max-width: 600px;
+}
+
+.chat-container {
+    display: block;
+    height: auto;
+    margin-bottom: 5px;
+    padding: 15px;
+    background-color: #f2f2f2;
+    border-radius: 15px;
+    max-height: 60%;
+    overflow: auto;
+}
+
+.message-input {
+    flex: 1;
+    padding: 10px;
+    margin-right: 5px;
+    border-radius: 15px;
+    border: 1px solid #ccc;
+    resize: none;
+    font-size: 16px;
+    background: #f9f3ff;
+}
+.send-button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: all 200ms;
+}
+.send-button:hover {
+    opacity: 90%;
+    scale: 102%;
+}
