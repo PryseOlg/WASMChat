@@ -1,5 +1,6 @@
 ﻿@page "/chats/"
 @inject HttpClient Http
+@inject CurrentUserAccessor CurrentUserAccessor
 
 <PageTitle>Chats</PageTitle>
 
@@ -9,7 +10,7 @@
 
 @code {
     private ChatUserModel? _chatUser;
-    private List<ChatModel>? _chats;
+    private List<ChatModel> _chats = new();
     
     [Parameter]
     public int ChatId { get; set; }
@@ -18,8 +19,7 @@
     {
         try
         {
-            var userResponse = await Http.GetFromJsonAsync<GetChatUserResult>("api/Chats/users/current");
-            _chatUser = userResponse!.User;
+            _chatUser = await CurrentUserAccessor.GetCurrentUserAsync();
 
             var chatsResponse = await Http.GetFromJsonAsync<GetAllChatsResult>("api/Chats");
             _chats = chatsResponse!.Chats.ToList();

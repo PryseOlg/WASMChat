@@ -1,14 +1,19 @@
 ﻿@using WASMChat.Shared.Models.Chats
 
-@if (Chats is not null)
+@if (Chats is null)
 {
-    @foreach (var chat in Chats)
+    <LoadingComponent/>
+}
+else
+{
+    @foreach (ChatModel chat in Chats)
     {
         <ListedChatComponent Chat="@chat"/>
     }
 }
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public IEnumerable<ChatModel>? Chats { get; set; }
+
 }

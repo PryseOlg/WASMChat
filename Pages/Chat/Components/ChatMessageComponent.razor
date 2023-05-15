@@ -1,13 +1,12 @@
 ﻿@using WASMChat.Shared.Models.Chats
 @using System.Diagnostics.CodeAnalysis
-@using WASMChat.Pages.Chat.Extensions
 @using WASMChat.Shared.Requests.Chats.Messages
 @inject ChatHubClient HubClient
 @inject IJSRuntime JsRuntime
 
 <div class="@(IsAuthor ? "message-author" : "message-other")">
     <p>
-        @Message.Author.FormatUserName() at @Message.SentTime.LocalDateTime
+        <ChatUserComponent User="@Message.Author"/> at @Message.SentTime.LocalDateTime
         @if (IsAuthor)
         {
             <button @onclick="@DeleteMessage">X</button>
@@ -18,14 +17,16 @@
 </div>
 
 @code {
-    [Parameter, NotNull]
-    public ChatMessageModel? Message { get; set; }
+
+    [Parameter, EditorRequired]
+    public ChatMessageModel Message { get; set; } = null!;
+
     [Parameter]
-    public bool IsAuthor { get; set; }
+    public bool IsAuthor { get; set; } = false;
 
     private async Task DeleteMessage()
     {
-        var request = new DeleteChatMessageRequest()
+        var request = new DeleteChatMessageRequest
         {
             ChatId = Message.ChatId,
             MessageId = Message.Id,

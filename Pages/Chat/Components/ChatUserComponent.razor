@@ -1,11 +1,26 @@
 ﻿@using WASMChat.Shared.Models.Chats
+@using System.Diagnostics.CodeAnalysis
+@using System.Runtime.InteropServices
 
-@if (User is not null)
+@if (User is null)
 {
-    <h4>@User.UserName<b>#@User.Id</b></h4>
+    <LoadingComponent/>
+}
+else
+{
+    <span style="color: @GetColorHex()">■</span>@User.UserName<b>#@User.Id</b>
 }
 
 @code {
+
     [Parameter]
     public ChatUserModel? User { get; set; }
+    
+    private string GetColorHex()
+    {
+        int colorCode = new Random(User!.Id).Next(0xffffff + 1);
+        byte[] colorBytes = BitConverter.GetBytes(colorCode);
+        string hex = Convert.ToHexString(colorBytes[..3]);
+        return $"#{hex}";
+    }
 }

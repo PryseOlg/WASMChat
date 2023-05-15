@@ -1,10 +1,23 @@
 ﻿@using System.Diagnostics.CodeAnalysis
 
 <a href="chats/@Chat.Id/">
-    <h5>@Chat.Name <b>#@Chat.Id</b></h5>    
-</a>
+    <h5>@Chat.Name <b>#@Chat.Id</b></h5>
+</a><br/>
+@if (_lastMessage is not null)
+{
+    <ChatMessageComponent Message="@_lastMessage" IsAuthor="@false"/>
+}
 
 @code {
-    [Parameter, NotNull]
-    public ChatModel? Chat { get; set; }
+
+    [Parameter, EditorRequired]
+    public ChatModel Chat { get; set; } = null!;
+
+    private ChatMessageModel? _lastMessage;
+
+    protected override void OnInitialized()
+    {
+        _lastMessage = Chat.Messages.MaxBy(m => m.SentTime);
+    }
+
 }

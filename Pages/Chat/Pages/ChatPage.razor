@@ -10,7 +10,7 @@
 <br/>
 @foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
 {
-    @user.FormatUserName() <br/>
+    <ChatUserComponent User="@user"/><br/>
 }
 
 <div class="chat-container">
