@@ -5,13 +5,23 @@
 @using WASMChat.Shared.Results.Chats
 @using System.Net.Http.Json
 @using Microsoft.Extensions.Logging
+@using WASMChat.Pages.Chat.Extensions
+@using WASMChat.Pages.Chat.Services
 @using WASMChat.Shared.Requests.Chats.Messages
 @using WASMChat.Shared.Results.Chats.Messages
+@inject CurrentUserAccessor CurrentUserAccessor
 @inject HttpClient Http
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger;
 
+<a href="chats/">⬅️ Назад</a><br/>
+<h1>@_chat?.Name</h1>
 @(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")
+<br/>
+@foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
+{
+    @user.FormatUserName() <br/>
+}
 
 <div class="chat-container">
     <a href="/Chats/">⬅️ Назад</a>
@@ -27,7 +37,12 @@
         }
     </div>
     <div class="chat-input-container">
-        <textarea class="message-input" @bind="@_typedMessage" minlength="1" maxlength="@PostChatMessageRequest.MaxTextLength"></textarea>
+        <textarea 
+            class="message-input" 
+            @bind="@_typedMessage" 
+            minlength="@Shared.Constants.Messages.MinMessageTextLength" 
+            maxlength="@Shared.Constants.Messages.MaxMessageTextLength">
+        </textarea>
         <button class="send-button" @onclick="@SendMessage">📨</button>
     </div>
 </div>
@@ -47,6 +62,7 @@
         Logger.LogInformation("Subscribing to hub");
         HubClient.OnMessagePosted += AddMessage;
         HubClient.OnMessageDeleted += DeleteMessage;
+        HubClient.OnMessageEdited += EditMessage;
             
         await HubClient.StartAsync();
         await PullMessagesAsync();
@@ -59,7 +75,7 @@
             var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
             _chat = result!.Chat;
             _messages = _chat.Messages.ToDictionary(m => m.Id, m => m);
-            _currentUser = result.CurrentUser;
+            _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
         }
         catch (AccessTokenNotAvailableException e)
         {
@@ -102,6 +118,13 @@
     {
         Logger.LogInformation("Deleting message with ID {Id}", result.MessageId);
         _messages.Remove(result.MessageId);
+        StateHasChanged();
+    }
+
+    private void EditMessage(EditChatMessageResult result)
+    {
+        Logger.LogInformation("Editing message with ID {Id}", result.EditedMessage.Id);
+        _messages[result.EditedMessage.Id] = result.EditedMessage;
         StateHasChanged();
     }
 }

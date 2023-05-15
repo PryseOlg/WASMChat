@@ -43,6 +43,13 @@ public class ChatHubClient : HubClientBase
         _logger.LogInformation("Sent message {Request}", request);
     }
 
+    public async Task EditMessage(EditChatMessageRequest request)
+    {
+        _logger.LogInformation("Sending message {Request}", request);
+        await Connection.InvokeCoreAsync(nameof(IChatHub.EditMessage), new object?[] { request });
+        _logger.LogInformation("Sent message {Request}", request);
+    }
+
     private void SubscribeEvents()
     {
         Connection.On<PostChatMessageResult>(

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WASMChat.Data.Entities.Chats;
-
 namespace WASMChat.Data.Repositories;
 
 public class ChatMessageRepository : RepositoryBase<ChatMessage>
@@ -37,6 +36,12 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
     public async ValueTask DeleteMessageAsync(ChatMessage message)
     {
         Set.Remove(message);
+        await CommitAsync();
+    }
+
+    public async ValueTask EditMessageAsync(ChatMessage message)
+    {
+        Set.Update(message);
         await CommitAsync();
     }
 }

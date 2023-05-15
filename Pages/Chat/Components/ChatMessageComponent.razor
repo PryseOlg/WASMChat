@@ -2,13 +2,14 @@
 @using System.Diagnostics.CodeAnalysis
 @using Microsoft.JSInterop
 @using WASMChat.CommonComponents.JsInterop
+@using WASMChat.Pages.Chat.Extensions
 @using WASMChat.Shared.Requests.Chats.Messages
 @inject ChatHubClient HubClient
 @inject IJSRuntime JsRuntime
 
 <div class="@(IsAuthor ? "message-author" : "message-other")">
     <p>
-        @Message.Author.UserName<b>#@Message.Author.Id</b> at @Message.SentTime.LocalDateTime
+        @Message.Author.FormatUserName() at @Message.SentTime.LocalDateTime
         @if (IsAuthor)
         {
             <button @onclick="@DeleteMessage">X</button>

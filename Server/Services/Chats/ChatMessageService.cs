@@ -48,4 +48,21 @@ public class ChatMessageService : IService
 
         await _chatMessageRepository.DeleteMessageAsync(message);
     }
+
+    public async ValueTask<ChatMessage> EditMessageAsync(
+        int messageId, 
+        int authorId, 
+        int? referencedMessageId, 
+        string? newText)
+    {
+        ChatMessage? msg = await _chatMessageRepository.GetMessageAsync(messageId);
+        NotFoundException.ThrowIfNull(msg);
+        UnauthorizedException.ThrowIf(msg.AuthorId != authorId);
+
+        if (newText is not null)
+            msg.MessageText = newText;
+        msg.ReferencedMessageId = referencedMessageId;
+        await _chatMessageRepository.EditMessageAsync(msg);
+        return msg;
+    }
 }

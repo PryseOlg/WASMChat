@@ -3,30 +3,44 @@
 @using WASMChat.Shared.Requests.Chats
 @using WASMChat.Shared.Results.Chats
 @using System.Net.Http.Json
+@using WASMChat.Pages.Chat.Extensions
+@using WASMChat.Pages.Chat.Services
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
+@inject CurrentUserAccessor CurrentUserAccessor
 
-<input type="text" maxlength="64" @bind="@_chatName"/>
-<select multiple @bind="@_memberIds">
-    @foreach (var user in _users)
-    {
-        <option value="@user.Id">@user.UserName</option>
-    }
-</select>
+<a href="chats/">⬅️ Назад</a><br/>
+<input type="text" maxlength="64" @bind="@_chatName"/><br/>
+@if (_currentUser is not null)
+{
+    <input type="checkbox" checked disabled/>
+    @_currentUser.FormatUserName()
+    <text> (Это вы)</text>
+    <br/>
+}
+@foreach (var user in _selectedUsers)
+{
+    <input type="checkbox" @onchange="@(e => _selectedUsers[user.Key] = (bool)e.Value!)"/>
+    @user.Key.FormatUserName()
+    <br/>
+}
 <button @onclick="Submit">✅</button>
 
 @code {
-    
+
     private string _chatName = "Название чата";
-    private int[] _memberIds = Array.Empty<int>();
-    private ChatUserModel[] _users = Array.Empty<ChatUserModel>();
+    private ChatUserModel? _currentUser;
+    private Dictionary<ChatUserModel, bool> _selectedUsers = new();
 
     protected override async Task OnInitializedAsync()
     {
+        _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
         try
         {
             var result = await Http.GetFromJsonAsync<GetAllUsersResult>("api/Chats/users");
-            _users = result!.Users;
+            _selectedUsers = result!.Users
+                .ToDictionary(u => u, _ => false);
+            _selectedUsers.Remove(_currentUser);
         }
         catch (Exception e)
         {
@@ -41,7 +55,10 @@
         var request = new CreateChatRequest()
         {
             ChatName = _chatName,
-            MemberIds = _memberIds
+            MemberIds = _selectedUsers
+                .Where(x => x.Value)
+                .Select(x => x.Key.Id)
+                .ToArray()
         };
 
         try
@@ -61,6 +78,5 @@
 
     private bool FormIsIncomplete() =>
         string.IsNullOrWhiteSpace(_chatName) ||
-        _memberIds.Any() is false;
-
+        _selectedUsers.Any(u => u.Value) is false;
 }

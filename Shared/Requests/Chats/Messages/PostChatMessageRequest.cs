@@ -7,12 +7,11 @@ namespace WASMChat.Shared.Requests.Chats.Messages;
 
 public record PostChatMessageRequest : IRequest<PostChatMessageResult>
 {
-    public const int MaxTextLength = 2000;
-    
+    public ClaimsPrincipal? User { get; init; }
     public int AuthorId { get; init; }
     public int? ReferencedMessageId { get; init; }
-    public ClaimsPrincipal? User { get; init; }
     public required int ChatId { get; init; }
-    [MinLength(1), MaxLength(MaxTextLength)]
+    [MinLength(Constants.Messages.MinMessageTextLength)]
+    [MaxLength(Constants.Messages.MaxMessageTextLength)]
     public required string Text { get; init; }
 }
