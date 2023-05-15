@@ -1,27 +1,14 @@
 ﻿@using System.Diagnostics.CodeAnalysis
 
-<style>
-    .hui {
-        display: block;
-        height: auto;
-        margin-bottom: 5px;
-        padding: 15px;
-        background-color: #f2f2f2;
-        border-radius: 15px;
-        max-height: 60%;
-        overflow: auto;
-    }
-</style>
-
-<div class="hui">
-    <a href="chats/@Chat.Id/">
-        <h5>@Chat.Name <b>#@Chat.Id</b></h5>
-    </a><br/>
+<a href="chats/@Chat.Id/" class="list-chat">
+    <div class="name-chat">
+        <h5 class="center">@Chat.Name <b>#@Chat.Id</b></h5>
+    </div>
     @if (_lastMessage is not null)
     {
         <ChatMessageComponent Message="@_lastMessage" IsAuthor="@false"/>
     }
-</div>
+</a>
 
 @code {
 

@@ -1,0 +1,28 @@
+﻿.list-chat {
+    display: block;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #d9e4f8;
+    border-radius: 15px;
+    transition: all 200ms;
+    text-decoration: none;
+}
+
+.name-chat {
+    display: flex;
+    padding: 10px;
+    background-color: #94e1a1;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+
+}
+.list-chat:hover {
+    opacity: 90%;
+    scale: 102%;
+}
+
+.center {
+    align-content: center;
+}
