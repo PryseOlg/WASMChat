@@ -1,2 +1,21 @@
 ﻿@using Microsoft.AspNetCore.Components.Web
 @using WASMChat.Pages.Chat.Components
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.AspNetCore.SignalR.Client
+@using System.Net.Http.Json
+@using Microsoft.Extensions.Logging
+
+@* Local folders *@
+@using WASMChat.Pages.Chat.Extensions
+@using WASMChat.Pages.Chat.Services
+
+@* Shared *@
+@using WASMChat.Shared.Models.Chats
+@using WASMChat.Shared.Requests.Chats
+@using WASMChat.Shared.Results.Chats
+@using WASMChat.Shared.Requests.Chats.Messages
+@using WASMChat.Shared.Results.Chats.Messages
+
+@* Js interop *@
+@using Microsoft.JSInterop
+@using WASMChat.CommonComponents.JsInterop
