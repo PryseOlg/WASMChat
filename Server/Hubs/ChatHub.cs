@@ -31,23 +31,17 @@ public class ChatHub : Hub<IChatHubClient>, IChatHub
 
     public Task PostMessage(PostChatMessageRequest request)
     {
-        request = request with { User = Context.User };
-        _logger.LogInformation("Processing request {Request}",
-            request);
-        return _mediator.Send(request);
+        return _mediator.Send(request with { User = Context.User });
     }
 
     public Task DeleteMessage(DeleteChatMessageRequest request)
     {
-        request = request with { User = Context.User };
-        _logger.LogInformation("Processing request {Request}",
-            request);
-        return _mediator.Send(request);
+        return _mediator.Send(request with { User = Context.User });
     }
 
     public Task EditMessage(EditChatMessageRequest request)
     {
-        throw new NotImplementedException();
+        return _mediator.Send(request with { User = Context.User });
     }
 
     public override async Task OnConnectedAsync()

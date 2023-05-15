@@ -24,7 +24,9 @@ public abstract class HubClientBase
             .Build();
     }
     
-    public Task StartAsync() => Connection.StartAsync();
+    public Task StartAsync() => Connection.State is HubConnectionState.Disconnected ?
+        Connection.StartAsync() :
+        Task.CompletedTask;
 
     private async Task<string?> RetrieveToken()
     {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using WASMChat.Client;
 using WASMChat.Pages.Chat;
+using WASMChat.Pages.Chat.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -17,5 +18,6 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().Cre
 builder.Services.AddApiAuthorization();
 
 builder.Services.AddScoped<ChatHubClient>();
+builder.Services.AddScoped<CurrentUserAccessor>();
 
 await builder.Build().RunAsync();
