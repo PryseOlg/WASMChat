@@ -3,6 +3,7 @@
 @inject HttpClient Http
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger;
+@inject IJSRuntime JsRuntime;
 
 <PageTitle>@_chat?.Name</PageTitle>
 
@@ -25,7 +26,7 @@
         @(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")
     </div>
     
-    <div class="chat-messages-container">
+    <div id="my-container" class="chat-messages-container">
         @if (_chat is not null)
         {
             @foreach (var msg in _messages.Values
@@ -62,6 +63,7 @@
     {
         _showUserList = !_showUserList;
     }
+    
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,10 +115,12 @@
         }
     }
 
-    private void AddMessage(PostChatMessageResult result)
+    private async void AddMessage(PostChatMessageResult result)
     {
         Logger.LogInformation("Received event {Result}", result);
         _messages.Add(result.Message.Id, result.Message);
+        
+        await JsRuntime.InvokeVoidAsync("scrollContainerDown");
         StateHasChanged();
     }
 

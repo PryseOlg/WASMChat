@@ -92,4 +92,5 @@
 
 .no-decor {
     text-decoration: none;
+    display: flex;
 }
