@@ -6,5 +6,5 @@ namespace WASMChat.Shared.Requests.Chats;
 
 public record GetCurrentChatUserRequest : IRequest<GetCurrentChatUserResult>
 {
-    public ClaimsPrincipal User { get; init; } = null!;
+    public ClaimsPrincipal? User { get; init; }
 }

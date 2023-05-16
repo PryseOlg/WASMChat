@@ -29,7 +29,7 @@ public class GetChatHandler : IRequestHandler<GetChatRequest, GetChatResult>
 
     public async Task<GetChatResult> Handle(GetChatRequest request, CancellationToken cancellationToken)
     {
-        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User);
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User!);
 
         Chat chat = await _chatService.GetChatAsync(request.ChatId, user.Id);
         

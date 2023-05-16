@@ -6,6 +6,6 @@ namespace WASMChat.Shared.Requests.Chats;
 
 public record GetChatRequest : IRequest<GetChatResult>
 {
-    public ClaimsPrincipal User { get; init; } = null!;
+    public ClaimsPrincipal? User { get; init; }
     public required int ChatId { get; init; }
 }

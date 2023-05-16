@@ -26,7 +26,7 @@ public class CreateChatHandler : IRequestHandler<CreateChatRequest, CreateChatRe
 
     public async Task<CreateChatResult> Handle(CreateChatRequest request, CancellationToken cancellationToken)
     {
-        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User);
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User!);
 
         Chat chat = await _chatService.CreateChatAsync(
             request.ChatName, 

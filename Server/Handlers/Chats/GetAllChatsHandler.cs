@@ -26,7 +26,7 @@ public class GetAllChatsHandler : IRequestHandler<GetAllChatsRequest, GetAllChat
 
     public async Task<GetAllChatsResult> Handle(GetAllChatsRequest request, CancellationToken cancellationToken)
     {
-        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User);
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User!);
 
         var chats = await _chatService.GetChatsAsync(user.Id, request.Page);
         
