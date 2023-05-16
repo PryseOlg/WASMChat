@@ -4,6 +4,8 @@
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger;
 
+<PageTitle>@_chat?.Name</PageTitle>
+
 <a href="chats/">⬅️ Назад</a><br/>
 <h1>@_chat?.Name</h1>
 @(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")

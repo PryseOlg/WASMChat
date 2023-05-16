@@ -1,0 +1,23 @@
+﻿@layout CommonComponents.Shared.MainLayout
+@inherits LayoutComponentBase
+@inject CurrentUserAccessor CurrentUserAccessor
+
+@if (_currentUser is null)
+{
+    <LoadingComponent/>
+}
+else
+{
+    <ChatUserComponent User="@_currentUser"/> <text>(Это вы)</text>
+}
+
+@Body
+
+@code {
+
+    private ChatUserModel? _currentUser;
+    protected override async Task OnInitializedAsync()
+    {
+        _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
+    }
+}

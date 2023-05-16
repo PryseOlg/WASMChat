@@ -3,15 +3,10 @@
 @inject NavigationManager NavigationManager
 @inject CurrentUserAccessor CurrentUserAccessor
 
+<PageTitle>Создание чата</PageTitle>
+
 <a href="chats/">⬅️ Назад</a><br/>
 <input type="text" maxlength="64" @bind="@_chatName"/><br/>
-@if (_currentUser is not null)
-{
-    <input type="checkbox" checked disabled/>
-    <ChatUserComponent User="@_currentUser"/>
-    <text> (Это вы)</text>
-    <br/>
-}
 @foreach (var user in _selectedUsers)
 {
     <input type="checkbox" @onchange="@(e => _selectedUsers[user.Key] = (bool)e.Value!)"/>
