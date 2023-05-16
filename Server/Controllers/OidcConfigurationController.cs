@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace WASMChat.Server.Controllers;
 
-public class OidcConfigurationController : Controller
+public class OidcConfigurationController : ControllerBase
 {
     private readonly ILogger<OidcConfigurationController> _logger;
 

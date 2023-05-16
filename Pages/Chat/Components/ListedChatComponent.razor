@@ -2,6 +2,7 @@
 
 <a href="chats/@Chat.Id/" class="list-chat">
     <div class="name-chat">
+        <img alt="Avatar" src="api/Files?Id=@Chat.AvatarId" class="avatar"/>
         <h5 class="center">@Chat.Name <b>#@Chat.Id</b></h5>
     </div>
     @if (_lastMessage is not null)

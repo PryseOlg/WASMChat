@@ -1,5 +1,4 @@
-﻿using WASMChat.Shared.Results.Chats;
-using WASMChat.Shared.Results.Chats.Messages;
+﻿using WASMChat.Shared.Results.Chats.Messages;
 
 namespace WASMChat.Shared.HubContracts.Chats;
 

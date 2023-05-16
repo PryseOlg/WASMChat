@@ -1,4 +1,5 @@
 ﻿using WASMChat.Data.Entities.Abstractions;
+using WASMChat.Data.Entities.Files;
 
 namespace WASMChat.Data.Entities.Chats;
 
@@ -7,7 +8,9 @@ public class ChatUser : ISoftDeletable
     public int Id { get; set; }
     
     public required string Name { get; set; }
-    
+
+    public int AvatarId { get; set; } = 1;
+    public DatabaseFile? Avatar { get; set; }
 
     public ApplicationUser? ApplicationUser { get; set; }
     public required string ApplicationUserId { get; set; }

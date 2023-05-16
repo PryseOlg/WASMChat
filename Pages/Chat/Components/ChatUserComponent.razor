@@ -8,19 +8,12 @@
 }
 else
 {
-    <span style="color: @GetColorHex()">■</span>@User.UserName<b>#@User.Id</b>
+    <img alt="@User.AvatarId" src="api/Files?Id=@User.AvatarId" class="avatar"/>
+    @User.UserName<b>#@User.Id</b>
 }
 
 @code {
 
     [Parameter]
     public ChatUserModel? User { get; set; }
-    
-    private string GetColorHex()
-    {
-        int colorCode = new Random(User!.Id).Next(0xffffff + 1);
-        byte[] colorBytes = BitConverter.GetBytes(colorCode);
-        string hex = Convert.ToHexString(colorBytes[..3]);
-        return $"#{hex}";
-    }
 }

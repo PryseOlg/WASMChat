@@ -22,6 +22,7 @@ public class ChatModelMapper : IMapper
         {
             Id = chat.Id,
             Name = chat.Name,
+            AvatarId = chat.AvatarId,
             Users = chat.ChatUsers.Select(_userModelMapper.Create).ToArray(),
             Messages = chat.Messages.Select(_chatMessageModelMapper.Create).ToArray(),
         };
