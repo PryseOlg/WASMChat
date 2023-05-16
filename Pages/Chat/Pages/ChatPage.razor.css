@@ -66,14 +66,30 @@
 }
 
 .user-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     max-height: 0;
     overflow: hidden;
+    background: #96e7c1;
+    border-radius: 15px;
+    padding: 10px;
+    z-index: 9999;
 }
 
 .user-list.show {
     opacity: 1;
-    max-height: 500px; /* Регулируйте высоту в зависимости от количества пользователей */
+    max-height: 500px;
     transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
+}
+
+.user-list-container {
+    position: relative;
+    display: inline-block;
+}
+
+.no-decor {
+    text-decoration: none;
 }

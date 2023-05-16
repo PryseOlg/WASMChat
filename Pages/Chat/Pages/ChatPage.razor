@@ -6,25 +6,25 @@
 
 <PageTitle>@_chat?.Name</PageTitle>
 
-<h1>@_chat?.Name</h1>
-
-
-<button class="send-button" @onclick="ToggleUserList">Показать пользователей чата</button>
-
-<div class="user-list @(_showUserList ? "show" : "")">
-    @foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
-    {
-        <option value="@user.Id">@user.UserName</option>
-    }
-</div>
+<a class="no-decor" href="/Chats/">⬅️ Назад</a>
 
 <div class="chat-container">
     
     <div class="navbar">
-        <a class="order" href="/Chats/">⬅️ Назад</a>
+        <h2 class="order">@_chat?.Name</h2>
+        
+        <div class="user-list-container">
+            <button class="send-button" @onclick="ToggleUserList">Посмотреть пользователей чата</button>
+            <div class="user-list @(_showUserList ? "show" : "")">
+                @foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
+                {
+                    <option value="@user.Id">@user.UserName</option>
+                }
+            </div>
+        </div>
         @(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")
     </div>
-   
+    
     <div class="chat-messages-container">
         @if (_chat is not null)
         {
