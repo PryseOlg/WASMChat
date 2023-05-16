@@ -48,7 +48,32 @@
     border: none;
     border-radius: 5px;
     font-size: 16px;
+    transition: 200ms;
 }
 .send-button:hover {
-    background-color: #ffffff;
+    scale: 102%;
+    opacity: 90%;
+    transition: 200ms;
+}
+
+.navbar {
+    display: flex;
+    text-decoration: none;
+}
+
+.order {
+    order: 0;
+}
+
+.user-list {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.user-list.show {
+    opacity: 1;
+    max-height: 500px; /* Регулируйте высоту в зависимости от количества пользователей */
+    transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out;
 }

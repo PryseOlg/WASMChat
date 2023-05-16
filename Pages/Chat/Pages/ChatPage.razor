@@ -6,18 +6,25 @@
 
 <PageTitle>@_chat?.Name</PageTitle>
 
-<a href="chats/">⬅️ Назад</a><br/>
 <h1>@_chat?.Name</h1>
-@(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")
-<br/>
-@foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
-{
-    <ChatUserComponent User="@user"/><br/>
-}
+
+
+<button class="send-button" @onclick="ToggleUserList">Показать пользователей чата</button>
+
+<div class="user-list @(_showUserList ? "show" : "")">
+    @foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
+    {
+        <option value="@user.Id">@user.UserName</option>
+    }
+</div>
 
 <div class="chat-container">
-    <a href="/Chats/">⬅️ Назад</a>
-    <button class="refresh-button" @onclick="@PullMessagesAsync">🔃</button>
+    
+    <div class="navbar">
+        <a class="order" href="/Chats/">⬅️ Назад</a>
+        @(HubClient.Connection.State == HubConnectionState.Connected ? "🟢" : "🔴")
+    </div>
+   
     <div class="chat-messages-container">
         @if (_chat is not null)
         {
@@ -48,6 +55,13 @@
     private Dictionary<int, ChatMessageModel> _messages = new();
 
     private string _typedMessage = string.Empty;
+    
+    private bool _showUserList;
+
+    private void ToggleUserList()
+    {
+        _showUserList = !_showUserList;
+    }
 
     protected override async Task OnInitializedAsync()
     {
