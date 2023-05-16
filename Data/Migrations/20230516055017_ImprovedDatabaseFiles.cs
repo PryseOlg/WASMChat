@@ -24,6 +24,11 @@ namespace WASMChat.Data.Migrations
                 nullable: false,
                 defaultValue: "");
 
+            migrationBuilder.DeleteData(
+                table: "DatabaseFiles",
+                keyColumn: "Id",
+                keyValue: 1);
+
             migrationBuilder.InsertData(
                 table: "DatabaseFiles",
                 columns: new[] { "Id", "Content", "MimeType", "Name", "Scope" },
