@@ -20,6 +20,13 @@ public class ChatUserEntityConfiguration: IEntityTypeConfiguration<ChatUser>
         builder.HasMany(x => x.Messages)
             .WithOne(x => x.Author)
             .HasForeignKey(x => x.AuthorId);
+
+        builder.HasOne(x => x.Avatar)
+            .WithMany()
+            .HasForeignKey(x => x.AvatarId);
+        
+        builder.Property(x => x.AvatarId)
+            .HasDefaultValue(1);
         
         builder.SoftDeletable();
     }

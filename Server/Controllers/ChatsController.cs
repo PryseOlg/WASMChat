@@ -2,7 +2,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Requests.Chats.Messages;
 using WASMChat.Shared.Results.Chats;

@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace WASMChat.Server.Middlewares;
+﻿namespace WASMChat.Server.Middlewares;
 
 /// <summary>
 /// Adds special headers to suppress ngrok enter message.

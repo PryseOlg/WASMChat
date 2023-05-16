@@ -11,6 +11,7 @@ public class ChatUserModelMapper : IMapper
         {
             Id = user.Id,
             UserName = user.Name,
+            AvatarId = user.AvatarId
         };
     }
 }

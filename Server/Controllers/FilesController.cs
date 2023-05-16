@@ -1,31 +1,35 @@
-﻿using System.Net.Mime;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using WASMChat.Data.Repositories;
-using WASMChat.Server.Exceptions;
+using WASMChat.Shared.Requests;
 
 namespace WASMChat.Server.Controllers;
 
 [ApiController]
 [Route("api/[Controller]")]
-public class FilesController : Controller
+public class FilesController : ControllerBase
 {
-    private readonly DatabaseFileRepository _dbFileRepo;
+    private readonly IMediator _mediator;
 
     public FilesController(
-        DatabaseFileRepository dbFileRepo)
+        IMediator mediator)
     {
-        _dbFileRepo = dbFileRepo;
+        _mediator = mediator;
     }
 
     [HttpGet("{fileName}")]
-    public async Task<IActionResult> GetFile(
-        [FromRoute] string fileName)
+    public async Task<FileStreamResult> GetFileByName(
+        [FromRoute] string fileName,
+        [FromQuery] GetFileRequest request)
     {
-        var file = await _dbFileRepo.GetByNameAsync(fileName);
-        NotFoundException.ThrowIfNull(file);
+        var result = await _mediator.Send(request with { Name = fileName });
+        return new FileStreamResult(new MemoryStream(result.Content), result.MimeType);
+    }
+    
 
-        MemoryStream ms = new(file.Content);
-        ms.Position = 0;
-        return File(ms, MediaTypeNames.Image.Jpeg);
+    public async Task<FileStreamResult> GetFileById(
+        [FromQuery] GetFileRequest request)
+    {
+        var result = await _mediator.Send(request);
+        return new FileStreamResult(new MemoryStream(result.Content), result.MimeType);
     }
 }

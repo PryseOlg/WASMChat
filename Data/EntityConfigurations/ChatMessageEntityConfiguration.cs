@@ -23,7 +23,12 @@ public class ChatMessageEntityConfiguration: IEntityTypeConfiguration<ChatMessag
 
         builder.Property(x => x.DateTimeSent)
             .ValueGeneratedOnAdd();
-        
+
+        builder.HasOne(x => x.Attachment)
+            .WithMany()
+            .IsRequired(false)
+            .HasForeignKey(x => x.AttachmentId);
+
         builder.SoftDeletable();
     }
 }

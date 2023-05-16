@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WASMChat.Data.Entities.Chats;
-namespace WASMChat.Data.Repositories;
+using WASMChat.Shared.Constants;
+
+namespace WASMChat.Data.Repositories.Chats;
 
 public class ChatMessageRepository : RepositoryBase<ChatMessage>
 {
-    private const int MessagesPerPage = 100;
-
     public ChatMessageRepository(DbContext ctx) : base(ctx)
     { }
 
@@ -20,15 +20,15 @@ public class ChatMessageRepository : RepositoryBase<ChatMessage>
     public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesAsync(int chatId, int page = 0) => await Set
         .Where(m => m.ChatId == chatId)
         .OrderByDescending(m => m.DateTimeSent)
-        .Skip(page * MessagesPerPage)
-        .Take(MessagesPerPage)
+        .Skip(Database.MessagesPerPage * page)
+        .Take(Database.MessagesPerPage)
         .ToArrayAsync();
     
     public async ValueTask<IReadOnlyCollection<ChatMessage>> GetMessagesBeforeAsync(int chatId, DateTimeOffset radix) => await Set
         .Where(m => m.ChatId == chatId)
         .Where(m => m.DateTimeSent < radix)
         .OrderByDescending(m => m.DateTimeSent)
-        .Take(MessagesPerPage)
+        .Take(Database.MessagesPerPage)
         .ToArrayAsync();
 
     public ValueTask<ChatMessage?> GetMessageAsync(int messageId) => Set.FindAsync(messageId);

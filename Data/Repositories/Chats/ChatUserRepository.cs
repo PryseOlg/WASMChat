@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WASMChat.Data.Entities.Chats;
 
-namespace WASMChat.Data.Repositories;
+namespace WASMChat.Data.Repositories.Chats;
 
 
 

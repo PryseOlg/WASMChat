@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WASMChat.Data;
 
 #nullable disable
 
-namespace WASMChat.Server.Data.Migrations
+namespace WASMChat.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230516060845_AddedRelationsToFilesAndDefaultChatAvatar")]
+    partial class AddedRelationsToFilesAndDefaultChatAvatar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -406,9 +409,7 @@ namespace WASMChat.Server.Data.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AvatarId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(2);
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
@@ -442,9 +443,6 @@ namespace WASMChat.Server.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AttachmentId")
-                        .HasColumnType("integer");
-
                     b.Property<int>("AuthorId")
                         .HasColumnType("integer");
 
@@ -473,8 +471,6 @@ namespace WASMChat.Server.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AttachmentId");
-
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("ChatId");
@@ -497,9 +493,7 @@ namespace WASMChat.Server.Data.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("AvatarId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(1);
+                        .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("DeletedTime")
                         .HasColumnType("timestamp with time zone");
@@ -659,10 +653,6 @@ namespace WASMChat.Server.Data.Migrations
 
             modelBuilder.Entity("WASMChat.Data.Entities.Chats.ChatMessage", b =>
                 {
-                    b.HasOne("WASMChat.Data.Entities.Files.DatabaseFile", "Attachment")
-                        .WithMany()
-                        .HasForeignKey("AttachmentId");
-
                     b.HasOne("WASMChat.Data.Entities.Chats.ChatUser", "Author")
                         .WithMany("Messages")
                         .HasForeignKey("AuthorId")
@@ -678,8 +668,6 @@ namespace WASMChat.Server.Data.Migrations
                     b.HasOne("WASMChat.Data.Entities.Chats.ChatMessage", "ReferencedMessage")
                         .WithMany()
                         .HasForeignKey("ReferencedMessageId");
-
-                    b.Navigation("Attachment");
 
                     b.Navigation("Author");
 

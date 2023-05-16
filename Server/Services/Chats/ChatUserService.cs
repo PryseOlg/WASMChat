@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using WASMChat.Data.Entities.Chats;
 using WASMChat.Data.Repositories;
+using WASMChat.Data.Repositories.Chats;
 using WASMChat.Server.Exceptions;
-using WASMChat.Shared.Requests.Chats;
 
 namespace WASMChat.Server.Services.Chats;
 

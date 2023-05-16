@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using MediatR;
+﻿using MediatR;
 using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Shared.Requests.Chats;
