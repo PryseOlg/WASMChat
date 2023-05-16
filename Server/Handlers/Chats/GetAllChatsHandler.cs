@@ -13,28 +13,22 @@ public class GetAllChatsHandler : IRequestHandler<GetAllChatsRequest, GetAllChat
     private readonly ChatService _chatService;
     private readonly ChatModelMapper _chatModelMapper;
     private readonly ChatUserService _chatUserService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public GetAllChatsHandler(
         ChatService chatService, 
         ChatModelMapper chatModelMapper, 
-        ChatUserService chatUserService, 
-        IHttpContextAccessor httpContextAccessor)
+        ChatUserService chatUserService)
     {
         _chatService = chatService;
         _chatModelMapper = chatModelMapper;
         _chatUserService = chatUserService;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<GetAllChatsResult> Handle(GetAllChatsRequest request, CancellationToken cancellationToken)
     {
-        HttpContext ctx = _httpContextAccessor.GetContext();
-        
-        ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
-        request = request with { UserId = user.Id };
-        
-        var chats = await _chatService.GetChatsAsync(request.UserId, request.Page);
+        ChatUser user = await _chatUserService.GetOrRegisterAsync(request.User);
+
+        var chats = await _chatService.GetChatsAsync(user.Id, request.Page);
         
         var result = new GetAllChatsResult
         {

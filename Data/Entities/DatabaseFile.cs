@@ -1,4 +1,6 @@
-﻿namespace WASMChat.Data.Entities.Files;
+﻿using WASMChat.Shared.Models;
+
+namespace WASMChat.Data.Entities;
 
 public class DatabaseFile
 {

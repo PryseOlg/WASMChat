@@ -1,12 +1,14 @@
 ﻿using MediatR;
-using WASMChat.Data.Entities.Files;
+using WASMChat.Data.Entities;
 using WASMChat.Server.Services;
 using WASMChat.Shared.Requests;
 using WASMChat.Shared.Results;
 
 namespace WASMChat.Server.Handlers;
 
-public class GetFileHandler : IRequestHandler<GetFileRequest, GetFileResult>
+public class GetFileHandler : 
+    IRequestHandler<GetFileByIdRequest, GetFileResult>,
+    IRequestHandler<GetFileByNameRequest, GetFileResult>
 {
     private readonly DatabaseFileService _databaseFileService;
 
@@ -16,15 +18,21 @@ public class GetFileHandler : IRequestHandler<GetFileRequest, GetFileResult>
         _databaseFileService = databaseFileService;
     }
 
-    public async Task<GetFileResult> Handle(GetFileRequest request, CancellationToken cancellationToken)
+    public async Task<GetFileResult> Handle(GetFileByIdRequest request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(request.Name) && request.Id is null)
-            throw new ArgumentException("You need to specified either file name or id", nameof(request));
+        DatabaseFile file = await _databaseFileService.GetFileByIdAsync(request.Id);
+        var result = new GetFileResult
+        {
+            Content = file.Content,
+            MimeType = file.MimeType,
+        };
 
-        DatabaseFile file = string.IsNullOrWhiteSpace(request.Name)
-            ? await _databaseFileService.GetFileByIdAsync(request.Id!.Value)
-            : await _databaseFileService.GetFileByNameAsync(request.Name);
+        return result;
+    }
 
+    public async Task<GetFileResult> Handle(GetFileByNameRequest request, CancellationToken cancellationToken)
+    {
+        DatabaseFile file = await _databaseFileService.GetFileByNameAsync(request.Name);
         var result = new GetFileResult
         {
             Content = file.Content,

@@ -4,5 +4,6 @@ public static class Database
 {
     public const int MessagesPerPage = 100;
     public const int ChatsPerPage = 10;
+    public const int ChatNameMaxLength = 128;
 
 }

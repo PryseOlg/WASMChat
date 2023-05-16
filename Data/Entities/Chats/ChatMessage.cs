@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WASMChat.Data.Entities.Abstractions;
-using WASMChat.Data.Entities.Files;
 
 namespace WASMChat.Data.Entities.Chats;
 

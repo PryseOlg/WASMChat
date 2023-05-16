@@ -5,5 +5,5 @@ namespace WASMChat.Shared.Requests.Chats;
 
 public record GetAllUsersRequest : IRequest<GetAllUsersResult>
 {
-    public int Page { get; init; } = 0;
+    public required int Page { get; init; } = 0;
 }

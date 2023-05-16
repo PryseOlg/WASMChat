@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using WASMChat.Server.Extensions;
 using WASMChat.Shared.Requests;
+using WASMChat.Shared.Results;
+using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Server.Controllers;
 
@@ -15,21 +18,20 @@ public class FilesController : ControllerBase
     {
         _mediator = mediator;
     }
-
+    
     [HttpGet("{fileName}")]
     public async Task<FileStreamResult> GetFileByName(
         [FromRoute] string fileName,
-        [FromQuery] GetFileRequest request)
-    {
-        var result = await _mediator.Send(request with { Name = fileName });
-        return new FileStreamResult(new MemoryStream(result.Content), result.MimeType);
-    }
-    
+        [FromQuery] GetFileByNameRequest request)
+        => await _mediator.Send(request with { Name = fileName }).AwaitFileStreamResult();
 
+    [HttpGet]
     public async Task<FileStreamResult> GetFileById(
-        [FromQuery] GetFileRequest request)
-    {
-        var result = await _mediator.Send(request);
-        return new FileStreamResult(new MemoryStream(result.Content), result.MimeType);
-    }
+        [FromQuery] GetFileByIdRequest request)
+        => await _mediator.Send(request).AwaitFileStreamResult();
+    
+    [HttpPost]
+    public async Task<PostFileResult> PostFile(
+        [FromBody] PostFileRequest request)
+        => await _mediator.Send(request);
 }

@@ -23,7 +23,7 @@ public class CurrentUserAccessor
 
     private async ValueTask<ChatUserModel> FetchAsync()
     {
-        var result = await _http.GetFromJsonAsync<GetChatUserResult>($"api/Chats/users/current");
+        var result = await _http.GetFromJsonAsync<GetCurrentChatUserResult>($"api/Chats/users/current");
         return result!.User;
     }
 }

@@ -17,6 +17,7 @@ using WASMChat.Server.Middlewares;
 using WASMChat.Server.Options;
 using WASMChat.Server.Pipelines;
 using WASMChat.Server.Services;
+using WASMChat.Server.Swagger;
 using WASMChat.Server.Validators;
 
 namespace WASMChat.Server;
@@ -144,6 +145,9 @@ public class Startup
     /// <param name="options"></param>
     private static void ConfigureSwaggerGen(SwaggerGenOptions options)
     {
+        options.OperationFilter<SwaggerRequiredOperationFilter>();
+        options.SchemaFilter<SwaggerRequiredSchemaFilter>();
+        
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Title = "WASMChat API",
@@ -170,5 +174,6 @@ public class Startup
                 Array.Empty<string>()
             }
         });
+        options.DescribeAllParametersInCamelCase();
     }
 }

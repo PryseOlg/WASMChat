@@ -2,7 +2,7 @@
 
 namespace WASMChat.Shared.Results.Chats;
 
-public record GetChatUserResult
+public record GetCurrentChatUserResult
 {
     public required ChatUserModel User { get; init; }
 }

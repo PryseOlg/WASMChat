@@ -1,6 +1,7 @@
-﻿using WASMChat.Data.Entities.Files;
+﻿using WASMChat.Data.Entities;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Exceptions;
+using WASMChat.Shared.Models;
 
 namespace WASMChat.Server.Services;
 
@@ -26,5 +27,28 @@ public class DatabaseFileService : IService
         DatabaseFile? file = await _repo.GetByIdAsync(id);
         NotFoundException.ThrowIfNull(file);
         return file;
+    }
+
+    public async ValueTask<DatabaseFile> SaveDatabaseFile(
+        byte[] content, string mimeType, string fileName, string? scope = null)
+    {
+        var incomingFileExtension = Path.GetExtension(fileName);
+        var newFileName = Guid.NewGuid() + incomingFileExtension;
+        
+        DatabaseFile savedFile = new()
+        {
+            Content = content,
+            MimeType = mimeType,
+            Name = newFileName
+        };
+
+        if (Enum.TryParse(scope, out DatabaseFileScope parsedScope))
+        {
+            savedFile.Scope = parsedScope;
+        }
+
+        await _repo.SaveFileAsync(savedFile);
+
+        return savedFile;
     }
 }

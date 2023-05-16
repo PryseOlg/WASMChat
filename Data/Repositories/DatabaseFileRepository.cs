@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WASMChat.Data.Entities.Files;
+using WASMChat.Data.Entities;
 
 namespace WASMChat.Data.Repositories;
 
@@ -14,9 +14,9 @@ public class DatabaseFileRepository : RepositoryBase<DatabaseFile>
     public async ValueTask<DatabaseFile?> GetByIdAsync(int id)
         => await Set.FindAsync(id);
 
-    public async ValueTask<DatabaseFile> SaveFile(DatabaseFile file)
+    public async ValueTask<DatabaseFile> SaveFileAsync(DatabaseFile file)
     {
-        Set.Update(file);
+        Set.Add(file);
         await CommitAsync();
         return file;
     }

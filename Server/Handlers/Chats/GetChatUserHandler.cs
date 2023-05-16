@@ -8,7 +8,7 @@ using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Server.Handlers.Chats;
 
-public class GetChatUserHandler : IRequestHandler<GetChatUserRequest, GetChatUserResult>
+public class GetChatUserHandler : IRequestHandler<GetCurrentChatUserRequest, GetCurrentChatUserResult>
 {
     private readonly ChatUserService _chatUserService;
     private readonly ChatUserModelMapper _chatUserModelMapper;
@@ -24,13 +24,13 @@ public class GetChatUserHandler : IRequestHandler<GetChatUserRequest, GetChatUse
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public async Task<GetChatUserResult> Handle(GetChatUserRequest request, CancellationToken cancellationToken)
+    public async Task<GetCurrentChatUserResult> Handle(GetCurrentChatUserRequest request, CancellationToken cancellationToken)
     {
         HttpContext ctx = _httpContextAccessor.GetContext();
         
         ChatUser user = await _chatUserService.GetOrRegisterAsync(ctx.User);
         
-        var result = new GetChatUserResult
+        var result = new GetCurrentChatUserResult
         {
             User = _chatUserModelMapper.Create(user)
         };

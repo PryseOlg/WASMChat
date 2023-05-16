@@ -1,4 +1,4 @@
-﻿namespace WASMChat.Data.Entities.Files;
+﻿namespace WASMChat.Shared.Models;
 
 public enum DatabaseFileScope
 {

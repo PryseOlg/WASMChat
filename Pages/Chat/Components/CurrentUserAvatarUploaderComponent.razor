@@ -1,0 +1,28 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@inject ILogger<CurrentUserAvatarUploaderComponent> Logger
+
+<InputFile OnChange="OnFileChanged" accept="image/*">Смените аватар</InputFile>
+<button @onclick="@PushAvatar">✅</button>
+
+@code {
+    private IBrowserFile? _imageFile;
+    
+    private async Task OnFileChanged(InputFileChangeEventArgs e)
+    {
+        IBrowserFile file = e.File;
+        Logger.LogInformation("Received file with name {Name}", file.Name);
+
+        _imageFile = await file.RequestImageFileAsync("jpeg", 512, 512);
+        Logger.LogInformation("Successfully transformed image, size changed {From}->{To}",
+            file.Size, _imageFile.Size);
+    }
+
+    private async Task PushAvatar()
+    {
+        Console.WriteLine(_imageFile?.Name);
+        Console.WriteLine(_imageFile?.ContentType);
+        Console.WriteLine(_imageFile?.Size);
+        await Task.CompletedTask;
+    }
+
+}

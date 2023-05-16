@@ -27,9 +27,9 @@ public class ChatsController : ControllerBase
     /// <param name="request"></param>
     /// <returns></returns>
     [HttpGet("users/current")]
-    public Task<GetChatUserResult> GetChatUser(
-        [FromQuery] GetChatUserRequest request)
-        => _mediator.Send(request);
+    public Task<GetCurrentChatUserResult> GetChatUser(
+        [FromQuery] GetCurrentChatUserRequest request)
+        => _mediator.Send(request with { User = User });
     
     /// <summary>
     /// Gets all chats of current chat user.
@@ -39,7 +39,7 @@ public class ChatsController : ControllerBase
     [HttpGet]
     public Task<GetAllChatsResult> GetChats(
         [FromQuery] GetAllChatsRequest request)
-        => _mediator.Send(request);
+        => _mediator.Send(request with { User = User });
     
     /// <summary>
     /// Gets chat with specified id.
@@ -51,7 +51,7 @@ public class ChatsController : ControllerBase
     public Task<GetChatResult> GetChat(
         [FromRoute] int chatId,
         [FromQuery] GetChatRequest request)
-        => _mediator.Send(request with { ChatId = chatId });
+        => _mediator.Send(request with { ChatId = chatId, User = User });
     
     /// <summary>
     /// Creates chat with specified name and users.
@@ -61,20 +61,8 @@ public class ChatsController : ControllerBase
     [HttpPost]
     public Task<CreateChatResult> CreateChat(
         [FromBody] CreateChatRequest request)
-        => _mediator.Send(request);
-    
-    /// <summary>
-    /// Sends message to specified chat.
-    /// </summary>
-    /// <param name="chatId"></param>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [HttpPost("{chatId:int}/messages")]
-    public Task<PostChatMessageResult> PostMessage(
-        [FromRoute] int chatId,
-        [FromBody] PostChatMessageRequest request)
-        => _mediator.Send(request with { ChatId = chatId });
-    
+        => _mediator.Send(request with { User = User });
+
     /// <summary>
     /// Gets all chat users.
     /// </summary>
