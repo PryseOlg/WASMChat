@@ -1,0 +1,30 @@
+﻿.chat-members-container {
+    background: #aae8f5;
+    padding: 10px;
+    border-radius: 20px;
+    max-height: 800px;
+    max-width: 600px;
+}
+
+.member {
+    display: flex;
+}
+
+.no-decor {
+    text-decoration: none;
+}
+
+.send-button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: 200ms;
+}
+.send-button:hover {
+    scale: 102%;
+    opacity: 90%;
+    transition: 200ms;
+}

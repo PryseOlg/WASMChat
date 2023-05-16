@@ -5,15 +5,13 @@
 @inject IJSRuntime JsRuntime
 
 <div class="@(IsAuthor ? "message-author" : "message-other")">
-    <p>
-        <ChatUserComponent User="@Message.Author"/> at @Message.SentTime.LocalDateTime
-        @if (IsAuthor)
-        {
-            <button class="button" @onclick="@DeleteMessage">x</button>
-        }
-        <br/>
+    <div class="name-time">
+        <ChatUserComponent User="@Message.Author"/> at @Message.SentTime.ToString("HH:mm")
+        <button class="button-delete" @onclick="@DeleteMessage">x</button>
+    </div>
+    <div>
         @Message.Text
-    </p>
+    </div>
 </div>
 
 @code {

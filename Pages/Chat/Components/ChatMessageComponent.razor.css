@@ -3,7 +3,9 @@
 }
 
 .message-author {
-    align-self: start;
+    display: block;
+    justify-content: space-between;
+    align-items: flex-start;
     background-color: #d5b3f5;
     color: #000;
     border-radius: 0.5rem;
@@ -15,7 +17,9 @@
 }
 
 .message-other {
-    align-self: end;
+    display: block;
+    justify-content: space-between;
+    align-items: flex-end;
     background-color: #bfd3ea;
     color: #000;
     border-radius: 0.5rem;
@@ -26,5 +30,14 @@
 }
 
 .button-delete {
-    align-self: end;
+    border-radius: 15px;
+    border: none;
+    margin-left: auto;
+}
+
+.name-time {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: small;
 }

@@ -5,19 +5,24 @@
 
 <PageTitle>Создание чата</PageTitle>
 
-<a href="chats/">⬅️ Назад</a><br/>
-<input type="text" maxlength="64" @bind="@_chatName"/><br/>
-@foreach (var user in _selectedUsers)
-{
-    <input type="checkbox" @onchange="@(e => _selectedUsers[user.Key] = (bool)e.Value!)"/>
-    <ChatUserComponent User="@user.Key"/>
-    <br/>
-}
-<button @onclick="@Submit">✅</button>
+<div class="chat-members-container">
+    <a class="no-decor" href="chats/">⬅️ Назад</a><br/>
+    <input type="text" maxlength="64" @bind="@_chatName"/><br/>
+    @foreach (var user in _selectedUsers)
+    {
+        <div class="member">
+            <input type="checkbox" @onchange="@(e => _selectedUsers[user.Key] = (bool)e.Value!)"/>
+                    <ChatUserComponent User="@user.Key"/>
+        </div>
+        
+    }
+    <button class="send-button" @onclick="@Submit">Создать чат</button>
+</div>
+
 
 @code {
 
-    private string _chatName = "Название чата";
+    private string _chatName = "Название чата вав";
     private ChatUserModel? _currentUser;
     private Dictionary<ChatUserModel, bool> _selectedUsers = new();
 
