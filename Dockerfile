@@ -1,9 +1,11 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+﻿ARG ImageTag
+ARG Runtime=linux-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.5$ImageTag AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0.302$ImageTag AS build
 WORKDIR /src
 COPY ["Server/WASMChat.Server.csproj", "Server/"]
 COPY ["Client/WASMChat.Client.csproj", "Client/"]
