@@ -1,4 +1,5 @@
-﻿using WASMChat.Data.Entities;
+﻿using System.Web;
+using WASMChat.Data.Entities;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Exceptions;
 using WASMChat.Shared.Models;
@@ -32,9 +33,8 @@ public class DatabaseFileService : IService
     public async ValueTask<DatabaseFile> SaveDatabaseFile(
         byte[] content, string mimeType, string fileName, string? scope = null)
     {
-        var incomingFileExtension = Path.GetExtension(fileName);
-        var newFileName = Guid.NewGuid() + incomingFileExtension;
-        
+        var newFileName = Path.GetRandomFileName() + Path.GetExtension(fileName);
+
         DatabaseFile savedFile = new()
         {
             Content = content,

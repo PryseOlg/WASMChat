@@ -1,18 +1,20 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using MediatR;
+using WASMChat.Shared.Models;
 using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Shared.Requests;
 
 public record PostFileRequest : IRequest<PostFileResult>
 {
-    /// <example>Pepega.txt</example>
+    [DefaultValue("helloworld.txt")]
     public required string FileName { get; set; }
-    /// <example>SGVsbG8gd29ybGQh</example>
+    [DefaultValue("SGVsbG8gd29ybGQh")]
     [DataType(DataType.Upload)]
     public required string ContentBase64 { get; set; }
-    /// <example>text/plain</example>
+    [DefaultValue(System.Net.Mime.MediaTypeNames.Text.Plain)]
     public required string MimeType { get; set; }
-    /// <example>Attachment</example>
+    [DefaultValue(nameof(DatabaseFileScope.Attachment))]
     public string? Scope { get; set; }
 }

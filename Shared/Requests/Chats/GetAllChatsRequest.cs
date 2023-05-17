@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel;
+using System.Security.Claims;
 using MediatR;
 using WASMChat.Shared.Requests.Abstractions;
 using WASMChat.Shared.Results.Chats;
@@ -10,5 +11,6 @@ public record GetAllChatsRequest :
     IUserRequest
 {
     public ClaimsPrincipal? User { get; set; }
-    public required int Page { get; init; } = 0;
+    [DefaultValue(0)]
+    public required int Page { get; init; }
 }
