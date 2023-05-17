@@ -53,7 +53,7 @@ public class ChatHub : Hub<IChatHubClient>, IChatHub
 
     private async Task JoinGroups()
     {
-        UnauthorizedException.ThrowIfNull(Context.User);
+        NotAllowedException.ThrowIfNull(Context.User);
         ChatUser user = await _chatUserService.GetOrRegisterAsync(Context.User);
 
         var chatIds = await _chatService.GetAllChatIds(user.Id);

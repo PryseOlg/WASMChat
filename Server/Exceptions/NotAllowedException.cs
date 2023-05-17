@@ -2,21 +2,21 @@
 
 namespace WASMChat.Server.Exceptions;
 
-public class UnauthorizedException : Exception
+public class NotAllowedException : Exception
 {
     private const string DefaultMessage = "You are not authorized to do this!";
     
-    public UnauthorizedException(string? message = null) : base(message ?? DefaultMessage)
+    public NotAllowedException(string? message = null) : base(message ?? DefaultMessage)
     {
     }
     
     public static void ThrowIfNull([NotNull] object? param, string? message = null)
     {
-        if (param is null) throw new UnauthorizedException(message);
+        if (param is null) throw new NotAllowedException(message);
     }
 
     public static void ThrowIf(bool check, string? message = null)
     {
-        if (check) throw new UnauthorizedException(message);
+        if (check) throw new NotAllowedException(message);
     }
 }

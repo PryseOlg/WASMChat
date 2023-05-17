@@ -22,7 +22,7 @@ public class ErrorHandlingMiddleware : IMiddleware
         {
             context.Response.StatusCode = e switch
             {
-                UnauthorizedException => StatusCodes.Status401Unauthorized,
+                NotAllowedException => StatusCodes.Status403Forbidden,
                 ArgumentException => StatusCodes.Status400BadRequest,
                 NotFoundException => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status500InternalServerError

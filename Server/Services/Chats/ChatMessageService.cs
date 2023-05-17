@@ -42,7 +42,7 @@ public class ChatMessageService : IService
         var message = await _chatMessageRepository.GetMessageAsync(messageId);
         
         ArgumentNullException.ThrowIfNull(message, nameof(message));
-        UnauthorizedException.ThrowIf(message.AuthorId != authorId, "У вас нет прав удалять это сообщение");
+        NotAllowedException.ThrowIf(message.AuthorId != authorId, "У вас нет прав удалять это сообщение");
 
         await _chatMessageRepository.DeleteMessageAsync(message);
     }
@@ -55,7 +55,7 @@ public class ChatMessageService : IService
     {
         ChatMessage? msg = await _chatMessageRepository.GetMessageAsync(messageId);
         NotFoundException.ThrowIfNull(msg);
-        UnauthorizedException.ThrowIf(msg.AuthorId != authorId);
+        NotAllowedException.ThrowIf(msg.AuthorId != authorId);
 
         if (newText is not null)
             msg.MessageText = newText;

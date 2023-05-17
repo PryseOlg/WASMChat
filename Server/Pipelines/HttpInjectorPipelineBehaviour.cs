@@ -18,7 +18,7 @@ public class HttpInjectorPipelineBehaviour<TRequest, TResponse> : IPipelineBehav
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         request.User ??= _httpContextAccessor.HttpContext?.User;
-        UnauthorizedException.ThrowIfNull(request.User);
+        NotAllowedException.ThrowIfNull(request.User);
 
         return await next();
     }

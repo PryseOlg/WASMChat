@@ -34,7 +34,7 @@ public class ChatUserService : IService
         if (existingUser is not null) return existingUser;
 
         var appUser = await _applicationUserRepository.GetById(appUserId);
-        UnauthorizedException.ThrowIfNull(appUser);
+        NotAllowedException.ThrowIfNull(appUser);
 
         var newUser = new ChatUser
         {
@@ -53,5 +53,5 @@ public class ChatUserService : IService
     }
 
     private static string GetAppUserId(ClaimsPrincipal principal)
-        => principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedException();
+        => principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new NotAllowedException();
 }
