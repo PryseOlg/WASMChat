@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using System.Text.Encodings.Web;
+using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
@@ -78,12 +79,12 @@ public class Startup
             opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Append(MediaTypeNames.Application.Octet);
         });
 
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(HttpInjectorPipelineBehaviour<,>));
+        services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehaviour<,>));
         services.AddMediatR(mediatr =>
         {
             mediatr.RegisterServicesFromAssemblyContaining<Startup>();
         });
-        
-        services.AddScoped(typeof(LoggingPipelineBehaviour<,>));
 
         services.AddNgrok();
 
