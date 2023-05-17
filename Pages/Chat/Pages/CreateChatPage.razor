@@ -1,7 +1,6 @@
 ﻿@page "/chats/create"
-@inject HttpClient Http
 @inject NavigationManager NavigationManager
-@inject CurrentUserAccessor CurrentUserAccessor
+@inject HttpClient Http
 
 <PageTitle>Создание чата</PageTitle>
 
@@ -28,19 +27,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
-        try
-        {
-            var result = await Http.GetFromJsonAsync<GetAllUsersResult>("api/Chats/users");
-            _selectedUsers = result!.Users
-                .Where(u => u.Id != _currentUser.Id)
-                .ToDictionary(u => u, _ => false);
-        }
-        catch (Exception e)
-        {
-            Console.Error.WriteLine(e);
-            throw;
-        }
+        _currentUser = await Storage.GetCurrentUserAsync();
+        var allUsers = await Storage.GetUsersAsync();
+        _selectedUsers = allUsers
+            .Where(u => u.Id != _currentUser.Id)
+            .ToDictionary(u => u, _ => false);
     }
 
     private async Task Submit()

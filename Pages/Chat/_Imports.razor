@@ -6,7 +6,7 @@
 @using Microsoft.Extensions.Logging
 
 @* Local folders *@
-@using WASMChat.Pages.Chat.Services
+@using WASMChat.Pages.Chat.Storage
 
 @* Shared *@
 @using WASMChat.Shared.Models.Chats
@@ -20,3 +20,5 @@
 @using WASMChat.CommonComponents.JsInterop
 
 @using WASMChat.CommonComponents.Components
+
+@inject SharedChatDataStorage Storage

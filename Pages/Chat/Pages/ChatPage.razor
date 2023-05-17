@@ -1,9 +1,7 @@
 ﻿@page "/chats/{ChatId:int}"
-@inject CurrentUserAccessor CurrentUserAccessor
-@inject HttpClient Http
 @inject ChatHubClient HubClient
-@inject ILogger<ChatPage> Logger;
-@inject ChatJsInterop JsInterop;
+@inject ILogger<ChatPage> Logger
+@inject ChatJsInterop JsInterop
 
 <PageTitle>@_chat?.Name</PageTitle>
 
@@ -40,6 +38,7 @@
         <textarea 
             class="message-input" 
             @bind="@_typedMessage" 
+            @ref="@_inputRef"
             minlength="@Shared.Constants.Messages.MinMessageTextLength" 
             maxlength="@Shared.Constants.Messages.MaxMessageTextLength">
         </textarea>
@@ -51,6 +50,10 @@
 @code {
     [Parameter]
     public int ChatId { get; set; }
+
+    private ElementReference _inputRef;
+    private bool _shouldPreventTyping;
+    
     private ChatUserModel? _currentUser;
     private ChatModel? _chat;
     private Dictionary<int, ChatMessageModel> _messages = new();
@@ -78,21 +81,14 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await JsInterop.ScrollDown();
+        await _inputRef.FocusAsync();
     }
 
     private async Task PullMessagesAsync()
     {
-        try
-        {
-            var result = await Http.GetFromJsonAsync<GetChatResult>($"api/Chats/{ChatId}");
-            _chat = result!.Chat;
-            _messages = _chat.Messages.ToDictionary(m => m.Id, m => m);
-            _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
-        }
-        catch (AccessTokenNotAvailableException e)
-        {
-            e.Redirect();
-        }
+        _chat = await Storage.GetChatAsync(ChatId);
+        _messages = _chat.Messages.ToDictionary(m => m.Id, m => m);
+        _currentUser = await Storage.GetCurrentUserAsync();
     }
 
     private async Task SendMessage()

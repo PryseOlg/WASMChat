@@ -23,4 +23,11 @@ public class ChatUserRepository : RepositoryBase<ChatUser>
         .Skip(page * UsersPerPage)
         .Take(UsersPerPage)
         .ToArrayAsync();
+
+    public async ValueTask<ChatUser> UpdateUser(ChatUser user)
+    {
+        Set.Update(user);
+        await CommitAsync();
+        return user;
+    }
 }

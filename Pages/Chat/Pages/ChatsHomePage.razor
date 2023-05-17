@@ -1,45 +1,29 @@
 ﻿@page "/chats/"
-@inject HttpClient Http
-@inject CurrentUserAccessor CurrentUserAccessor
 
 <PageTitle>Chats</PageTitle>
 
 <div class="container">
     <div class="chat-user">
-        <ChatUserComponent User="@_chatUser"></ChatUserComponent> <br/>
+        <ChatUserComponent User="@_currentUser" /> <br/>
     </div>
     
     <a href="chats/create" class="send-button">Создать новый чат</a><br/>
     <div class="chat-container">
-        <ChatListComponent Chats="@_chats"></ChatListComponent>
+        <ChatListComponent Chats="@_chats" />
     </div>
     
 </div>
 
 @code {
-    private ChatUserModel? _chatUser;
-    private List<ChatModel> _chats = new();
+    private ChatUserModel? _currentUser;
+    private IReadOnlyCollection<ChatModel> _chats = Array.Empty<ChatModel>();
     
     [Parameter]
     public int ChatId { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            _chatUser = await CurrentUserAccessor.GetCurrentUserAsync();
-
-            var chatsResponse = await Http.GetFromJsonAsync<GetAllChatsResult>("api/Chats");
-            _chats = chatsResponse!.Chats.ToList();
-        }
-        catch (AccessTokenNotAvailableException exception)
-        {
-            exception.Redirect();
-        }
-        catch (Exception e)
-        {
-            Console.Error.WriteLine(e);
-        }
+        _currentUser = await Storage.GetCurrentUserAsync();
+        _chats = await Storage.GetChatsAsync();
     }
-
 }

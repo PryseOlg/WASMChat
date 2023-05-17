@@ -52,6 +52,12 @@ public class ChatUserService : IService
         return _chatUserRepository.GetAllAsync(page);
     }
 
+    public async ValueTask<ChatUser> UpdateUser(ChatUser user)
+    {
+        var updatedUser = await _chatUserRepository.UpdateUser(user);
+        return updatedUser;
+    }
+
     private static string GetAppUserId(ClaimsPrincipal principal)
         => principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new NotAllowedException();
 }

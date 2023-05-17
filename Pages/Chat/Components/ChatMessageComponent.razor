@@ -7,7 +7,10 @@
 <div class="@(IsAuthor ? "message-author" : "message-other")">
     <div class="name-time">
         <ChatUserComponent User="@Message.Author"/> at @Message.SentTime.ToString("HH:mm")
-        <button class="button-delete" @onclick="@DeleteMessage">x</button>
+        @if (IsAuthor)
+        {
+            <button class="button-delete" @onclick="@DeleteMessage">x</button>
+        }
     </div>
     <div>
         @Message.Text

@@ -1,6 +1,5 @@
 ﻿@layout CommonComponents.Shared.MainLayout
 @inherits LayoutComponentBase
-@inject CurrentUserAccessor CurrentUserAccessor
 
 @if (_currentUser is null)
 {
@@ -19,6 +18,6 @@ else
     private ChatUserModel? _currentUser;
     protected override async Task OnInitializedAsync()
     {
-        _currentUser = await CurrentUserAccessor.GetCurrentUserAsync();
+        _currentUser = await Storage.GetCurrentUserAsync();
     }
 }
