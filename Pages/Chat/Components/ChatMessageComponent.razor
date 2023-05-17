@@ -2,7 +2,7 @@
 @using System.Diagnostics.CodeAnalysis
 @using WASMChat.Shared.Requests.Chats.Messages
 @inject ChatHubClient HubClient
-@inject IJSRuntime JsRuntime
+@inject ChatJsInterop JsInterop
 
 <div class="@(IsAuthor ? "message-author" : "message-other")">
     <div class="name-time">
@@ -29,7 +29,7 @@
             ChatId = Message.ChatId,
             MessageId = Message.Id,
         };
-        if (await JsRuntime.ConfirmAsync("Вы уверены что хотите удалить сообщение?") is false) 
+        if (await JsInterop.CheckMessageDeletionIntended() is false) 
             return;
         
         await HubClient.DeleteMessage(request);

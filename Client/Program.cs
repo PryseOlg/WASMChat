@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using WASMChat.Client;
 using WASMChat.Pages.Chat;
 using WASMChat.Pages.Chat.Services;
+using Scrutor;
+using WASMChat.CommonComponents.JsInterop;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -16,6 +18,13 @@ builder.Services.AddHttpClient("WASMChat.ServerAPI", client => client.BaseAddres
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("WASMChat.ServerAPI"));
 
 builder.Services.AddApiAuthorization();
+
+builder.Services.Scan(scan =>
+{
+    scan.FromAssemblyDependencies(typeof(Program).Assembly)
+        .AddClasses(classes => classes.AssignableTo<JsInteropBase>())
+        .AsSelf();
+});
 
 builder.Services.AddScoped<ChatHubClient>();
 builder.Services.AddScoped<CurrentUserAccessor>();

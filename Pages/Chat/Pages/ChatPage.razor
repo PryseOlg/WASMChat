@@ -3,7 +3,7 @@
 @inject HttpClient Http
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger;
-@inject IJSRuntime JsRuntime;
+@inject ChatJsInterop JsInterop;
 
 <PageTitle>@_chat?.Name</PageTitle>
 
@@ -15,7 +15,7 @@
         <h4 class="order">@_chat?.Name</h4>
         
         <div class="user-list-container">
-            <button class="send-button" @onclick="ToggleUserList">Посмотреть пользователей чата</button>
+            <button class="send-button" @onclick="@ToggleUserList">Посмотреть пользователей чата</button>
             <div class="user-list @(_showUserList ? "show" : "")">
                 @foreach (var user in _chat?.Users ?? Array.Empty<ChatUserModel>())
                 {
@@ -64,7 +64,6 @@
         _showUserList = !_showUserList;
     }
     
-
     protected override async Task OnInitializedAsync()
     {
         Logger.LogInformation("Subscribing to hub");
@@ -74,6 +73,11 @@
             
         await HubClient.StartAsync();
         await PullMessagesAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsInterop.ScrollDown();
     }
 
     private async Task PullMessagesAsync()
@@ -115,12 +119,10 @@
         }
     }
 
-    private async void AddMessage(PostChatMessageResult result)
+    private void AddMessage(PostChatMessageResult result)
     {
         Logger.LogInformation("Received event {Result}", result);
         _messages.Add(result.Message.Id, result.Message);
-        
-        await JsRuntime.InvokeVoidAsync("scrollContainerDown");
         StateHasChanged();
     }
 
