@@ -1,6 +1,7 @@
 ﻿@page "/chats/create"
 @inject NavigationManager NavigationManager
 @inject HttpClient Http
+@inject ChatHubClient HubClient
 
 <PageTitle>Создание чата</PageTitle>
 
@@ -37,7 +38,7 @@
     private async Task Submit()
     {
         if (FormIsIncomplete()) return;
-        var request = new CreateChatRequest()
+        var request = new CreateChatRequest
         {
             ChatName = _chatName,
             MemberIds = _selectedUsers
@@ -45,14 +46,12 @@
                 .Select(x => x.Key.Id)
                 .ToArray()
         };
-
+        
         try
         {
-            var response = await Http.PostAsJsonAsync("api/Chats", request);
-            var result = await response.Content.ReadFromJsonAsync<CreateChatResult>();
-
-            int newChatId = result!.Chat.Id;
-            NavigationManager.NavigateTo($"chats/{newChatId}");
+            await HubClient.StartAsync(); 
+            await HubClient.CreateChat(request);
+            NavigationManager.NavigateTo("chats/");
         }
         catch (Exception e)
         {

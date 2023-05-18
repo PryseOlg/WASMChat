@@ -13,6 +13,7 @@ using WASMChat.Data.Entities;
 using WASMChat.Data;
 using WASMChat.Data.Repositories;
 using WASMChat.Server.Hubs;
+using WASMChat.Server.Hubs.Utilities;
 using WASMChat.Server.Mappers;
 using WASMChat.Server.Middlewares;
 using WASMChat.Server.Options;
@@ -71,6 +72,8 @@ public class Startup
         services.AddServices();
         services.AddValidators();
         services.AddMappers();
+
+        services.AddSingleton<ChatHubConnectionsHelper>();
         
         services.AddSignalR();
 

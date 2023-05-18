@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using WASMChat.CommonComponents.ApiClients;
 using WASMChat.Shared.HubContracts.Chats;
+using WASMChat.Shared.Requests.Chats;
 using WASMChat.Shared.Requests.Chats.Messages;
+using WASMChat.Shared.Results.Chats;
 using WASMChat.Shared.Results.Chats.Messages;
 
 namespace WASMChat.Pages.Chat;
@@ -28,6 +30,7 @@ public class ChatHubClient : HubClientBase
     public event Action<PostChatMessageResult> OnMessagePosted = null!;
     public event Action<DeleteChatMessageResult> OnMessageDeleted = null!;
     public event Action<EditChatMessageResult> OnMessageEdited = null!;
+    public event Action<CreateChatResult> OnChatCreated = null!;
 
     public async Task PostMessage(PostChatMessageRequest request)
     {
@@ -50,6 +53,13 @@ public class ChatHubClient : HubClientBase
         _logger.LogInformation("Sent message {Request}", request);
     }
 
+    public async Task CreateChat(CreateChatRequest request)
+    {
+        _logger.LogInformation("Sending message {Request}", request);
+        await Connection.InvokeCoreAsync(nameof(IChatHub.CreateChat), new object?[] { request });
+        _logger.LogInformation("Sent message {Request}", request);
+    }
+
     private void SubscribeEvents()
     {
         Connection.On<PostChatMessageResult>(
@@ -64,6 +74,10 @@ public class ChatHubClient : HubClientBase
             nameof(IChatHubClient.MessageEdited), 
             r => OnMessageEdited.Invoke(r));
         OnMessagePosted += Log;
+        Connection.On<CreateChatResult>(
+            nameof(IChatHubClient.ChatCreated),
+            r => OnChatCreated.Invoke(r));
+        OnChatCreated += Log;
     }
 
     private void Log(object? result) => _logger.LogInformation(

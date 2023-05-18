@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Logging;
+using WASMChat.CommonComponents.Extensions;
 using WASMChat.Shared.Models.Chats;
 using WASMChat.Shared.Results.Chats;
 using WASMChat.Shared.Results.Chats.Messages;
@@ -28,6 +29,7 @@ public class SharedChatDataStorage
         _chatHubClient.OnMessagePosted += AddMessage;
         _chatHubClient.OnMessageEdited += EditMessage;
         _chatHubClient.OnMessageDeleted += DeleteMessage;
+        _chatHubClient.OnChatCreated += CreateChat;
     }
 
     public async Task<ChatUserModel> GetCurrentUserAsync()
@@ -35,18 +37,17 @@ public class SharedChatDataStorage
         if (_currentUserId is not null) 
             return _users[_currentUserId.Value];
 
-        var result = await SafeHttpGet<GetCurrentChatUserResult>("api/Chats/users/current");
+        var result = await _http.SafeFetch<GetCurrentChatUserResult>("api/Chats/users/current");
         ChatUserModel currentUser = result.User;
         _currentUserId = currentUser.Id;
         _users[currentUser.Id] = currentUser;
         return currentUser;
     }
-
     public async Task<IReadOnlyCollection<ChatUserModel>> GetUsersAsync()
     {
         if (_allUsersLoaded) return _users.Values.ToArray();
 
-        var result = await SafeHttpGet<GetAllUsersResult>("api/Chats/users");
+        var result = await _http.SafeFetch<GetAllUsersResult>("api/Chats/users");
         var users = result.Users;
         foreach (var user in users)
         {
@@ -59,7 +60,7 @@ public class SharedChatDataStorage
     {
         if (_chats.Any()) return _chats.Values.Select(c => c.Chat).ToArray();
 
-        var result = await SafeHttpGet<GetAllChatsResult>("api/Chats");
+        var result = await _http.SafeFetch<GetAllChatsResult>("api/Chats");
         var chats = result.Chats;
         foreach (var chat in chats)
         {
@@ -74,7 +75,9 @@ public class SharedChatDataStorage
     }
     public async Task<ChatModel> GetChatAsync(int id)
     {
-        if (_chats[id].IsPreviewLoaded is false) return _chats[id].Chat;
+        if (_chats.TryGetValue(id, out StoredChatData? savedChat) 
+            && savedChat.IsPreviewLoaded is false) 
+            return savedChat.Chat;
         
         var result = await _http.GetFromJsonAsync<GetChatResult>($"api/Chats/{id}");
         var chat = result!.Chat;
@@ -96,20 +99,6 @@ public class SharedChatDataStorage
     private void DeleteMessage(DeleteChatMessageResult result)
         => _messages.Remove(result.MessageId);
 
-    private async Task<TResult> SafeHttpGet<TResult>(string uri)
-    {
-        try
-        {
-            var result = await _http.GetFromJsonAsync<TResult>(uri);
-            ArgumentNullException.ThrowIfNull(result);
-            return result;
-        }
-        catch (AccessTokenNotAvailableException e)
-        {
-            e.Redirect();
-            
-            await Task.Delay(-1);
-            return default!;
-        }
-    }
+    private void CreateChat(CreateChatResult result)
+        => _chats[result.Chat.Id] = new StoredChatData { Chat = result.Chat, IsPreviewLoaded = true };
 }

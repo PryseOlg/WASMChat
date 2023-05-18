@@ -6,7 +6,7 @@
 }
 else
 {
-    @foreach (ChatModel chat in Chats)
+    @foreach (ChatModel chat in Chats.OrderBy(c => c.Messages.FirstOrDefault()?.SentTime ?? DateTimeOffset.Now))
     {
         <ListedChatComponent Chat="@chat"/>
     }
@@ -15,5 +15,4 @@ else
 @code {
     [Parameter, EditorRequired]
     public IEnumerable<ChatModel>? Chats { get; set; }
-
 }

@@ -33,7 +33,7 @@ public class EditChatMessageHandler : IRequestHandler<EditChatMessageRequest, Ed
             request.ReferencedMessageId,
             request.NewText);
 
-        var result = new EditChatMessageResult()
+        var result = new EditChatMessageResult
         {
             EditedMessage = _chatMessageModelMapper.Create(msg)
         };
