@@ -2,9 +2,11 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using WASMChat.Shared.Models
 @using WASMChat.Shared.Requests
+@using System.Diagnostics.CodeAnalysis
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger
 @inject ChatJsInterop JsInterop
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@_chat?.Name</PageTitle>
 
@@ -49,13 +51,15 @@
         
         @*Вот тут 👇 сделать красиво 👉👈*@
         
-        <br/> 
-        <InputFile OnChange="@OnAttachmentChanged"></InputFile>
+        <br/>
+        <InputFile OnChange="@OnAttachmentChanged" accept="*/*"/>
     </div>
 </div>
 
 
 @code {
+    private const long AttachmentMaxSize = 0xFFFFF;
+    
     [Parameter]
     public int ChatId { get; set; }
 
@@ -101,37 +105,98 @@
 
     private async Task SendMessage()
     {
-        if (_chat is null) return;
-        if (HubClient?.Connection is not { State: HubConnectionState.Connected }) return;
+        if (CanSendMessage() is false) return;
         if (string.IsNullOrWhiteSpace(_typedMessage)) return;
 
-        int? attachmentId = null;
-        if (_attachment is not null)
-        {
-            var uploadedAttachment = await UploadAttachment();
-            attachmentId = uploadedAttachment.FileId;
-        }
-        
         var request = new PostChatMessageRequest
         {
             ChatId = _chat.Id,
             Text = _typedMessage,
-            AttachmentId = attachmentId
         };
 
         try
         {
             await HubClient.PostMessage(request);
             _typedMessage = string.Empty;
-            _attachment = null;
         }
         catch (Exception e)
         {
-            Console.Error.WriteLine(e);
+            Logger.LogError("Exception occured {Ex}", e);
             throw;
         }
     }
 
+    private async Task<PostFileResult> UploadAttachment()
+    {
+        ArgumentNullException.ThrowIfNull(_attachment);
+        Logger.LogInformation("Sending file {File} with size {Size}", 
+            _attachment.Name, _attachment.Size);
+        
+        var data = new MemoryStream();
+        await _attachment.OpenReadStream(AttachmentMaxSize).CopyToAsync(data);
+
+        PostFileRequest request = new()
+        {
+            FileName = _attachment.Name,
+            MimeType = _attachment.ContentType,
+            Scope = nameof(DatabaseFileScope.Attachment),
+            Content = data.ToArray()
+        };
+        Logger.LogInformation("Sending file {File}", _attachment.Name);
+        
+        var response = await Http.PostAsJsonAsync("api/Files", request);
+        return await response.Content.ReadFromJsonAsync<PostFileResult>() ?? throw new ArgumentException();
+    }
+
+    private async Task OnAttachmentChanged(InputFileChangeEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(e.File.ContentType))
+        {
+            await JsRuntime.AlertAsync("Тип файла не поддерживается");
+            return;
+        }
+        if (e.File.Size > AttachmentMaxSize)
+        {
+            await JsRuntime.AlertAsync("Файл слишком большой!");
+            return;
+        }
+        _attachment = e.File;
+        await SendAttachmentMessage();
+    }
+
+    private async Task SendAttachmentMessage()
+    {
+        if (_attachment is null) return;
+        if (CanSendMessage() is false) return;
+        
+        var uploadedAttachment = await UploadAttachment();
+        int attachmentId = uploadedAttachment.FileId;
+        
+        var request = new PostChatMessageRequest
+        {
+            ChatId = _chat.Id,
+            Text = _attachment.Name,
+            AttachmentId = attachmentId
+        };
+        
+        try
+        {
+            await HubClient.PostMessage(request);
+            _attachment = null;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError("Exception occured {Ex}", e);
+            throw;
+        }
+    }
+    
+    [MemberNotNullWhen(true, nameof(_chat))]
+    private bool CanSendMessage() =>
+        _chat is not null &&
+        HubClient?.Connection is { State: HubConnectionState.Connected };
+    
+    
     private void AddMessage(PostChatMessageResult result)
     {
         Logger.LogInformation("Received event {Result}", result);
@@ -153,28 +218,5 @@
         StateHasChanged();
     }
 
-    private async Task<PostFileResult> UploadAttachment()
-    {
-        ArgumentNullException.ThrowIfNull(_attachment);
-        Logger.LogInformation("Sending file {File} with size {Size}", 
-            _attachment.Name, _attachment.Size);
-        
-        var data = new MemoryStream();
-        await _attachment.OpenReadStream(0xFFFFFF).CopyToAsync(data);
-
-        PostFileRequest request = new()
-        {
-            FileName = _attachment.Name,
-            MimeType = _attachment.ContentType,
-            Scope = nameof(DatabaseFileScope.Attachment),
-            Content = data.ToArray()
-        };
-        Logger.LogInformation("Sending file {File}", _attachment.Name);
-        
-        var response = await Http.PostAsJsonAsync("api/Files", request);
-        return await response.Content.ReadFromJsonAsync<PostFileResult>() ?? throw new ArgumentException();
-    }
-
-    private void OnAttachmentChanged(InputFileChangeEventArgs e) => _attachment = e.File;
 }
 

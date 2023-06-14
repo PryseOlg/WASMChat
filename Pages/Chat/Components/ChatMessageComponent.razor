@@ -12,15 +12,20 @@
             <button class="button-delete" @onclick="@DeleteMessage">x</button>
         }
     </div>
-    <div>
-        @Message.Text
-    </div>
     @if (Message.AttachmentId is not null)
     {
         <div>
-            <img alt="attachment" src="@GetAttachmentUrl()" onerror='this.style.display = "none"' class="attachment"/>
-            <br/>
-            <a href="@GetAttachmentUrl()" target="_blank">скачать</a>
+            <a href="@GetAttachmentUrl()" target="_blank">
+                @Message.Text
+                <br/>
+                <img alt="attachment" src="@GetAttachmentUrl()" onerror='this.style.display = "none"' class="attachment"/>
+            </a>
+        </div>
+    }
+    else
+    {
+        <div>
+            @Message.Text
         </div>
     }
 </div>
