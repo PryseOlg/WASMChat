@@ -72,7 +72,7 @@
         {
             FileName = $"{_file.Name}.jpg",
             MimeType = _file.ContentType,
-            Scope = nameof(DatabaseFileScope.Attachment),
+            Scope = nameof(DatabaseFileScope.Avatar),
             ContentBase64 = Convert.ToBase64String(data.ToArray())
         };
         Logger.LogInformation("Saving file {Request}", request);
