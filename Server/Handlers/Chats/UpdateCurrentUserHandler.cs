@@ -6,12 +6,12 @@ using WASMChat.Shared.Results.Chats;
 
 namespace WASMChat.Server.Handlers.Chats;
 
-public class SetAvatarHandler : IRequestHandler<SetAvatarRequest, SetAvatarResult>
+public class UpdateCurrentUserHandler : IRequestHandler<UpdateCurrentUserRequest, UpdateCurrentUserResult>
 {
     private readonly ChatUserService _chatUserService;
     private readonly ChatUserModelMapper _chatUserModelMapper;
 
-    public SetAvatarHandler(
+    public UpdateCurrentUserHandler(
         ChatUserService chatUserService,
         ChatUserModelMapper chatUserModelMapper)
     {
@@ -19,14 +19,15 @@ public class SetAvatarHandler : IRequestHandler<SetAvatarRequest, SetAvatarResul
         _chatUserModelMapper = chatUserModelMapper;
     }
 
-    public async Task<SetAvatarResult> Handle(SetAvatarRequest request, CancellationToken cancellationToken)
+    public async Task<UpdateCurrentUserResult> Handle(UpdateCurrentUserRequest request, CancellationToken cancellationToken)
     {
         var currentUser = await _chatUserService.GetOrRegisterAsync(request.User!);
-        currentUser.AvatarId = request.FileId;
+        currentUser.AvatarId = request.AvatarId;
+        currentUser.Name = request.UserName;
 
         var updatedUser = await _chatUserService.UpdateUser(currentUser);
 
-        var result = new SetAvatarResult
+        var result = new UpdateCurrentUserResult
         {
             UpdatedUser = _chatUserModelMapper.Create(updatedUser)
         };

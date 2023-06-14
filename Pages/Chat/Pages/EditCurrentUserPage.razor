@@ -1,0 +1,83 @@
+﻿@page "/chats/user"
+@using Microsoft.AspNetCore.Components.Forms
+@using WASMChat.Shared.Models
+@using WASMChat.Shared.Requests
+@inject ILogger<EditCurrentUserPage> Logger
+
+<PageTitle>@_user?.UserName</PageTitle>
+
+<a class="no-decor" href="/Chats/">⬅️ Назад</a><br/>
+<input type="text" @bind="_userName"/><br/>
+<InputFile OnChange="OnFileChanged" accept="image/*">Смените аватар</InputFile>
+<br/>
+<button @onclick="@Save" disabled="@(CanBeSaved() is false)">СОХРАНИТЬ</button>
+
+@code {
+
+    private ChatUserModel? _user;
+    private string _userName = string.Empty;
+    private IBrowserFile? _file;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await Storage.GetCurrentUserAsync();
+        _userName = _user.UserName;
+    }
+
+    private bool CanBeSaved() => _file is not null || _userName != _user?.UserName;
+
+    private void OnFileChanged(InputFileChangeEventArgs e)
+    {
+        _file = e.File;
+    }
+    
+    private async Task Save()
+    {
+        PostFileResult? avatar = null;
+        if (_file is not null)
+        {
+            avatar = await SaveAvatar();
+            Logger.LogInformation("Saving avatar...");
+        }
+
+        UpdateCurrentUserRequest request = new()
+        {
+            AvatarId = avatar?.FileId ?? _user!.AvatarId,
+            UserName = _userName
+        };
+
+        await Http.PutAsJsonAsync("api/Chats/users/current", request);
+        await Storage.FetchCurrentUserAsync();
+        
+        NavigationManager.NavigateTo("Chats");
+    }
+
+    private async Task<PostFileResult> SaveAvatar()
+    {
+        ArgumentNullException.ThrowIfNull(_file);
+        
+        Logger.LogInformation("Compressing file {Name} with initial size {Size}", 
+            _file.Name, _file.Size);
+
+        const string jpegMime = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+        _file = await _file.RequestImageFileAsync(jpegMime, 512, 512);
+        
+        Logger.LogInformation("Compressing file {Name} to complete size {Size}", 
+            _file.Name, _file.Size);
+        
+        var data = new MemoryStream();
+        await _file.OpenReadStream(1024000).CopyToAsync(data);
+
+        PostFileRequest request = new()
+        {
+            FileName = $"{_file.Name}.jpg",
+            MimeType = _file.ContentType,
+            Scope = nameof(DatabaseFileScope.Attachment),
+            ContentBase64 = Convert.ToBase64String(data.ToArray())
+        };
+        Logger.LogInformation("Saving file {Request}", request);
+
+        var response = await Http.PostAsJsonAsync("api/Files", request);
+        return await response.Content.ReadFromJsonAsync<PostFileResult>() ?? throw new ArgumentException();
+    }
+}

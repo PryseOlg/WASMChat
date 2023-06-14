@@ -25,5 +25,10 @@
     {
         _currentUser = await Storage.GetCurrentUserAsync();
         _chats = await Storage.GetChatsAsync();
+        Storage.CurrentUserUpdated += c =>
+        {
+            _currentUser = c;
+            StateHasChanged();
+        };
     }
 }

@@ -32,6 +32,16 @@ public class ChatsController : ControllerBase
         => _mediator.Send(request);
     
     /// <summary>
+    /// Sets current users avatar.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPut("users/current")]
+    public Task<UpdateCurrentUserResult> SetAvatar(
+        [FromBody] UpdateCurrentUserRequest request)
+        => _mediator.Send(request);
+    
+    /// <summary>
     /// Gets all chats of current chat user.
     /// </summary>
     /// <param name="request"></param>
@@ -69,15 +79,5 @@ public class ChatsController : ControllerBase
     [HttpGet("users")]
     public Task<GetAllUsersResult> GetAllUsers(
         [FromQuery] GetAllUsersRequest request)
-        => _mediator.Send(request);
-    
-    /// <summary>
-    /// Sets current users avatar.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
-    [HttpPut("users/current/avatar")]
-    public Task<SetAvatarResult> SetAvatar(
-        [FromQuery] SetAvatarRequest request)
         => _mediator.Send(request);
 }

@@ -7,8 +7,7 @@
 }
 else
 {
-    <ChatUserComponent User="@_currentUser"/> <text>(Это вы)</text>
-    <CurrentUserAvatarUploaderComponent/>
+    <ChatUserComponent User="@_currentUser"/> <a href="chats/user">⚙️</a>
 }
 
 @Body
@@ -19,5 +18,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         _currentUser = await Storage.GetCurrentUserAsync();
+        Storage.CurrentUserUpdated += _ => StateHasChanged();
     }
 }

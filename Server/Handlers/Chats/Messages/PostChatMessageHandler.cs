@@ -43,6 +43,7 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
             request.Text, 
             request.AuthorId, 
             request.ChatId);
+        message.Author = user;
         
         var result = new PostChatMessageResult
         {

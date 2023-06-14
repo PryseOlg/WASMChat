@@ -2,7 +2,7 @@
 
 namespace WASMChat.Shared.Results.Chats;
 
-public record SetAvatarResult
+public record UpdateCurrentUserResult
 {
     public required ChatUserModel UpdatedUser { get; set; }
 }

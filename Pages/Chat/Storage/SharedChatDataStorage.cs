@@ -32,15 +32,22 @@ public class SharedChatDataStorage
 
     public async Task<ChatUserModel> GetCurrentUserAsync()
     {
-        if (_currentUserId is not null) 
-            return _users[_currentUserId.Value];
+        if (_currentUserId is null)
+            await FetchCurrentUserAsync();
+            
+        return _users[_currentUserId!.Value];
+    }
 
+    public async Task FetchCurrentUserAsync()
+    {
         var result = await SafeHttpGet<GetCurrentChatUserResult>("api/Chats/users/current");
         ChatUserModel currentUser = result.User;
         _currentUserId = currentUser.Id;
         _users[currentUser.Id] = currentUser;
-        return currentUser;
+        CurrentUserUpdated?.Invoke(currentUser);
     }
+
+    public event Action<ChatUserModel>? CurrentUserUpdated; 
 
     public async Task<IReadOnlyCollection<ChatUserModel>> GetUsersAsync()
     {
@@ -74,17 +81,22 @@ public class SharedChatDataStorage
     }
     public async Task<ChatModel> GetChatAsync(int id)
     {
-        if (_chats[id].IsPreviewLoaded is false) return _chats[id].Chat;
+        if (_chats.TryGetValue(id, out StoredChatData? data) && data.IsPreviewLoaded is false)
+        {
+            return data.Chat;
+        }
         
         var result = await _http.GetFromJsonAsync<GetChatResult>($"api/Chats/{id}");
         var chat = result!.Chat;
+        
         _chats[id] = new StoredChatData { Chat = chat, IsPreviewLoaded = false };
+        
         foreach (var msg in chat.Messages)
         {
             _messages[msg.Id] = msg;
         }
         
-        return _chats[id].Chat;
+        return chat;
     }
 
     private void AddMessage(PostChatMessageResult result)
