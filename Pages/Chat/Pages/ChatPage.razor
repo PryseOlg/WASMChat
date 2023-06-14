@@ -1,4 +1,7 @@
 ﻿@page "/chats/{ChatId:int}"
+@using Microsoft.AspNetCore.Components.Forms
+@using WASMChat.Shared.Models
+@using WASMChat.Shared.Requests
 @inject ChatHubClient HubClient
 @inject ILogger<ChatPage> Logger
 @inject ChatJsInterop JsInterop
@@ -43,6 +46,11 @@
             maxlength="@Shared.Constants.Messages.MaxMessageTextLength">
         </textarea>
         <button class="send-button" @onclick="@SendMessage">📨</button>
+        
+        @*Вот тут 👇 сделать красиво 👉👈*@
+        
+        <br/> 
+        <InputFile OnChange="@OnAttachmentChanged"></InputFile>
     </div>
 </div>
 
@@ -52,7 +60,7 @@
     public int ChatId { get; set; }
 
     private ElementReference _inputRef;
-    private bool _shouldPreventTyping;
+    private IBrowserFile? _attachment;
     
     private ChatUserModel? _currentUser;
     private ChatModel? _chat;
@@ -96,17 +104,26 @@
         if (_chat is null) return;
         if (HubClient?.Connection is not { State: HubConnectionState.Connected }) return;
         if (string.IsNullOrWhiteSpace(_typedMessage)) return;
+
+        int? attachmentId = null;
+        if (_attachment is not null)
+        {
+            var uploadedAttachment = await UploadAttachment();
+            attachmentId = uploadedAttachment.FileId;
+        }
         
         var request = new PostChatMessageRequest
         {
             ChatId = _chat.Id,
             Text = _typedMessage,
+            AttachmentId = attachmentId
         };
 
         try
         {
             await HubClient.PostMessage(request);
             _typedMessage = string.Empty;
+            _attachment = null;
         }
         catch (Exception e)
         {
@@ -135,5 +152,29 @@
         _messages[result.EditedMessage.Id] = result.EditedMessage;
         StateHasChanged();
     }
+
+    private async Task<PostFileResult> UploadAttachment()
+    {
+        ArgumentNullException.ThrowIfNull(_attachment);
+        Logger.LogInformation("Sending file {File} with size {Size}", 
+            _attachment.Name, _attachment.Size);
+        
+        var data = new MemoryStream();
+        await _attachment.OpenReadStream(0xFFFFFF).CopyToAsync(data);
+
+        PostFileRequest request = new()
+        {
+            FileName = _attachment.Name,
+            MimeType = _attachment.ContentType,
+            Scope = nameof(DatabaseFileScope.Attachment),
+            Content = data.ToArray()
+        };
+        Logger.LogInformation("Sending file {File}", _attachment.Name);
+        
+        var response = await Http.PostAsJsonAsync("api/Files", request);
+        return await response.Content.ReadFromJsonAsync<PostFileResult>() ?? throw new ArgumentException();
+    }
+
+    private void OnAttachmentChanged(InputFileChangeEventArgs e) => _attachment = e.File;
 }
 

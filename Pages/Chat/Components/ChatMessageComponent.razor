@@ -15,6 +15,14 @@
     <div>
         @Message.Text
     </div>
+    @if (Message.AttachmentId is not null)
+    {
+        <div>
+            <img alt="attachment" src="@GetAttachmentUrl()" onerror='this.style.display = "none"' class="attachment"/>
+            <br/>
+            <a href="@GetAttachmentUrl()" target="_blank">скачать</a>
+        </div>
+    }
 </div>
 
 @code {
@@ -24,6 +32,8 @@
 
     [Parameter]
     public bool IsAuthor { get; set; } = false;
+
+    private string GetAttachmentUrl() => $"api/Files?Id={Message.AttachmentId}";
 
     private async Task DeleteMessage()
     {

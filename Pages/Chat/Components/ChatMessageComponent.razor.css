@@ -2,6 +2,10 @@
     background: #0c4128;
 }
 
+.attachment {
+    width: 128px;
+}
+
 .message-author {
     display: block;
     justify-content: space-between;
