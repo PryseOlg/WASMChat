@@ -17,13 +17,14 @@ public class ChatMessageService : IService
         _chatUserService = chatUserService;
     }
 
-    public async ValueTask<ChatMessage> SendMessageAsync(string text, int authorId, int chatId)
+    public async ValueTask<ChatMessage> SendMessageAsync(string text, int authorId, int chatId, int? attachmentId)
     {
         ChatMessage message = new()
         {
             MessageText = text,
             AuthorId = authorId,
             ChatId = chatId,
+            AttachmentId = attachmentId
         };
 
         await _chatMessageRepository.SaveMessageAsync(message);

@@ -42,7 +42,8 @@ public class PostChatMessageHandler : IRequestHandler<PostChatMessageRequest, Po
         ChatMessage message = await _chatMessageService.SendMessageAsync(
             request.Text, 
             request.AuthorId, 
-            request.ChatId);
+            request.ChatId,
+            request.AttachmentId);
         message.Author = user;
         
         var result = new PostChatMessageResult

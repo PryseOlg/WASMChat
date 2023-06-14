@@ -10,11 +10,14 @@ public record PostFileRequest : IRequest<PostFileResult>
 {
     [DefaultValue("helloworld.txt")]
     public required string FileName { get; set; }
-    [DefaultValue("SGVsbG8gd29ybGQh")]
+    
+    [DefaultValue(new byte[] { 72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33 })]
     [DataType(DataType.Upload)]
-    public required string ContentBase64 { get; set; }
+    public required byte[] Content { get; set; }
+    
     [DefaultValue(System.Net.Mime.MediaTypeNames.Text.Plain)]
     public required string MimeType { get; set; }
+    
     [DefaultValue(nameof(DatabaseFileScope.Attachment))]
     public string? Scope { get; set; }
 }

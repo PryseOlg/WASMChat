@@ -18,10 +18,8 @@ public class PostFileHandler : IRequestHandler<PostFileRequest, PostFileResult>
 
     public async Task<PostFileResult> Handle(PostFileRequest request, CancellationToken cancellationToken)
     {
-        byte[] decodedContent = Convert.FromBase64String(request.ContentBase64);
-
         DatabaseFile savedFile = await _databaseFileService.SaveDatabaseFile(
-            decodedContent, request.MimeType, request.FileName, request.Scope);
+            request.Content, request.MimeType, request.FileName, request.Scope);
 
         var result = new PostFileResult
         {
