@@ -5,7 +5,7 @@
 }
 
 .container {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     background: #aae8f5;
     padding: 10px;

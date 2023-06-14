@@ -32,12 +32,12 @@
 .button-delete {
     border-radius: 15px;
     border: none;
+    margin-bottom: 16px;
     margin-left: auto;
 }
 
 .name-time {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     font-size: small;
 }
